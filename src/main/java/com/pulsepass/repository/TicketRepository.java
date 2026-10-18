@@ -8,11 +8,18 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
+    // NUEVO: buscar ticket por su código
+    Optional<Ticket> findByTicketCode(String ticketCode);
+
     // FR-TKT-006: tickets de un usuario por email (navegando Ticket -> User -> email)
     List<Ticket> findByUserEmail(String email);
+
+    // NUEVO: tickets de un usuario, ignorando mayúsculas, del más reciente al más viejo
+    List<Ticket> findByUserEmailIgnoreCaseOrderByPurchaseDateDesc(String email);
 
     // FR-TKT-006 (variante con status)
     List<Ticket> findByUserEmailAndStatus(String email, TicketStatus status);
@@ -37,4 +44,7 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
         order by t.event.eventDate asc
         """)
     List<Ticket> findTicketsOfUpcomingEvents(@Param("afterDate") LocalDateTime afterDate);
+        // FASE 4: dueño del ticket sin cargar la entidad (anti-IDOR)
+    @Query("select t.user.id from Ticket t where t.ticketCode = :ticketCode")
+    Optional<Long> findOwnerIdByTicketCode(@Param("ticketCode") String ticketCode);
 }
