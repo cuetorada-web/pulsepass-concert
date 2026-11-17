@@ -15,6 +15,9 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     // FR-EVT-002: recuperar por eventCode
     Optional<Event> findByEventCode(String eventCode);
 
+    // NUEVO: validar que el eventCode no exista
+    boolean existsByEventCode(String eventCode);
+
     // FR-VEN-004: eventos de un venue navegando la relación (Event -> Venue.code)
     List<Event> findByVenueCode(String venueCode);
 
