@@ -50,6 +50,7 @@ export const estados: Record<EstadoEvento, string> = {
   CANCELLED: 'Cancelado',
   FINISHED: 'Finalizado',
 }
+
 export const eventoDetalleSchema = eventoResumenSchema.extend({
   description: z.string().nullable(),
   minimumAge: z.number().int().nonnegative(),
@@ -58,3 +59,32 @@ export const eventoDetalleSchema = eventoResumenSchema.extend({
 })
 
 export type EventoDetalle = z.infer<typeof eventoDetalleSchema>
+
+export const crearEventoSchema = z.object({
+  eventCode: z
+    .string()
+    .trim()
+    .min(1, 'El código del evento es obligatorio.')
+    .max(30, 'Usa máximo 30 caracteres.'),
+  name: z
+    .string()
+    .trim()
+    .min(1, 'El nombre del evento es obligatorio.'),
+  description: z
+    .string()
+    .max(1000, 'La descripción puede tener máximo 1000 caracteres.'),
+  category: categoriaEventoSchema,
+  eventDate: z
+    .string()
+    .min(1, 'Selecciona la fecha y hora del evento.'),
+  minimumAge: z
+    .number()
+    .int('Debe ser un número entero.')
+    .min(0, 'La edad mínima no puede ser negativa.'),
+  venueCode: z
+    .string()
+    .trim()
+    .min(1, 'Selecciona una sede.'),
+})
+
+export type DatosCrearEvento = z.infer<typeof crearEventoSchema>

@@ -3,7 +3,7 @@ import { useAuth } from '../features/auth/AuthContext'
 import { cerrarSesion } from '../features/auth/sesion'
 import { RUTAS } from '../lib/rutas'
 
-const enlaces = [
+const enlacesPublicos = [
   { ruta: RUTAS.inicio, texto: 'Inicio' },
   { ruta: RUTAS.eventos, texto: 'Eventos' },
   { ruta: RUTAS.artistas, texto: 'Artistas' },
@@ -21,6 +21,20 @@ export default function Layout() {
   ) {
     return <Navigate to={RUTAS.login} replace />
   }
+
+  const esAutenticada = auth.estado === 'autenticada'
+  const esAdmin =
+    esAutenticada && auth.usuario.roles.includes('ADMIN')
+
+  const enlaces = [
+    ...enlacesPublicos,
+    ...(esAutenticada
+      ? [{ ruta: RUTAS.misTickets, texto: 'Mis tickets' }]
+      : []),
+    ...(esAdmin
+      ? [{ ruta: RUTAS.adminEventos, texto: 'Administrar eventos' }]
+      : []),
+  ]
 
   return (
     <div className="flex min-h-screen flex-col">
