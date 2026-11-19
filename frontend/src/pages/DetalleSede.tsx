@@ -27,10 +27,7 @@ function InformacionSede({ code }: InformacionSedeProps) {
   }
 
   if (consulta.isError) {
-    if (
-      consulta.error instanceof ApiError &&
-      consulta.error.status === 404
-    ) {
+    if (consulta.error instanceof ApiError && consulta.error.status === 404) {
       return <NoEncontrada />
     }
 
@@ -50,17 +47,12 @@ function InformacionSede({ code }: InformacionSedeProps) {
 
   return (
     <section aria-labelledby="titulo-sede">
-      <Link
-        to={RUTAS.sedes}
-        className="text-sm font-semibold text-primary-700 underline"
-      >
+      <Link to={RUTAS.sedes} className="text-sm font-semibold text-primary-700 underline">
         Volver a sedes
       </Link>
 
       <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-6 sm:p-10">
-        <p className="text-sm font-semibold text-primary-700">
-          {sede.city}
-        </p>
+        <p className="text-sm font-semibold text-primary-700">{sede.city}</p>
 
         <h1 id="titulo-sede" className="mt-3 text-3xl font-bold">
           {sede.name}
@@ -88,9 +80,7 @@ function InformacionSede({ code }: InformacionSedeProps) {
 
           <div>
             <dt className="font-semibold">Estado</dt>
-            <dd className="mt-1 text-slate-600">
-              {sede.active ? 'Activa' : 'Inactiva'}
-            </dd>
+            <dd className="mt-1 text-slate-600">{sede.active ? 'Activa' : 'Inactiva'}</dd>
           </div>
         </dl>
       </div>
@@ -106,10 +96,5 @@ export default function DetalleSede() {
     return <NoEncontrada />
   }
 
-  return (
-    <InformacionSede
-      key={resultado.data}
-      code={resultado.data}
-    />
-  )
+  return <InformacionSede key={resultado.data} code={resultado.data} />
 }

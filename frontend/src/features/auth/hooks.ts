@@ -5,8 +5,7 @@ import { queryClient } from '../../lib/queryClient'
 
 export const consultaUsuarioActual = {
   queryKey: ['auth', 'me'],
-  queryFn: ({ signal }: { signal: AbortSignal }) =>
-    obtenerUsuarioActual(signal),
+  queryFn: ({ signal }: { signal: AbortSignal }) => obtenerUsuarioActual(signal),
   staleTime: 60_000,
 }
 
@@ -18,9 +17,7 @@ export function useRegistro() {
 
 export function useLogin() {
   return useMutation({
-    mutationFn: async (
-      datos: Parameters<typeof iniciarSesion>[0],
-    ) => {
+    mutationFn: async (datos: Parameters<typeof iniciarSesion>[0]) => {
       const respuesta = await iniciarSesion(datos)
 
       guardarSesion(respuesta.accessToken, respuesta.expiresIn)

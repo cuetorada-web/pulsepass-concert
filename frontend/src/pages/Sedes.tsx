@@ -3,7 +3,6 @@ import { RUTAS } from '../lib/rutas'
 import ErrorConsulta from '../components/ErrorConsulta'
 import { useSedesActivas } from '../features/sedes/hooks'
 
-
 const formatoNumero = new Intl.NumberFormat('es-CO')
 
 export default function Sedes() {
@@ -11,10 +10,7 @@ export default function Sedes() {
 
   return (
     <section aria-labelledby="titulo-sedes">
-      <h1
-        id="titulo-sedes"
-        className="text-3xl font-bold tracking-tight"
-      >
+      <h1 id="titulo-sedes" className="text-3xl font-bold tracking-tight">
         Sedes
       </h1>
 
@@ -37,9 +33,7 @@ export default function Sedes() {
         />
       ) : consulta.data.length === 0 ? (
         <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-8 text-center">
-          <h2 className="text-xl font-semibold">
-            Todavía no hay sedes disponibles
-          </h2>
+          <h2 className="text-xl font-semibold">Todavía no hay sedes disponibles</h2>
 
           <p className="mt-3 text-slate-600">
             Aquí aparecerán los espacios disponibles para los eventos.
@@ -54,20 +48,14 @@ export default function Sedes() {
                   {sede.city}
                 </span>
 
-                <h2 className="mt-4 text-xl font-bold">
-                  {sede.name}
-                </h2>
+                <h2 className="mt-4 text-xl font-bold">{sede.name}</h2>
 
-                <p className="mt-2 text-sm text-slate-500">
-                  {sede.code}
-                </p>
+                <p className="mt-2 text-sm text-slate-500">{sede.code}</p>
 
                 <dl className="mt-6 space-y-4 text-sm">
                   <div>
                     <dt className="font-semibold">Dirección</dt>
-                    <dd className="mt-1 text-slate-600">
-                      {sede.address}
-                    </dd>
+                    <dd className="mt-1 text-slate-600">{sede.address}</dd>
                   </div>
 
                   <div>

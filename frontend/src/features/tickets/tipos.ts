@@ -1,18 +1,8 @@
 import { z } from 'zod'
 
-export const tipoTicketSchema = z.enum([
-  'GENERAL',
-  'VIP',
-  'BACKSTAGE',
-  'STUDENT',
-])
+export const tipoTicketSchema = z.enum(['GENERAL', 'VIP', 'BACKSTAGE', 'STUDENT'])
 
-export const estadoTicketSchema = z.enum([
-  'RESERVED',
-  'PAID',
-  'CANCELLED',
-  'USED',
-])
+export const estadoTicketSchema = z.enum(['RESERVED', 'PAID', 'CANCELLED', 'USED'])
 
 export const ticketSchema = z.object({
   id: z.number().int().positive(),

@@ -12,43 +12,26 @@ export function obtenerEventosPublicados(signal?: AbortSignal) {
   })
 }
 
-export function obtenerEventosPorArtista(
-  stageName: string,
-  signal?: AbortSignal,
-) {
+export function obtenerEventosPorArtista(stageName: string, signal?: AbortSignal) {
   const parametros = new URLSearchParams({ stageName })
 
-  return http(
-    `/api/events/by-artist?${parametros.toString()}`,
-    eventosSchema,
-    signal,
-    { publica: true },
-  )
+  return http(`/api/events/by-artist?${parametros.toString()}`, eventosSchema, signal, {
+    publica: true,
+  })
 }
 
-export function obtenerEvento(
-  eventCode: string,
-  signal?: AbortSignal,
-) {
-  return http(
-    `/api/events/${encodeURIComponent(eventCode)}`,
-    eventoDetalleSchema,
-    signal,
-  )
+export function obtenerEvento(eventCode: string, signal?: AbortSignal) {
+  return http(`/api/events/${encodeURIComponent(eventCode)}`, eventoDetalleSchema, signal)
 }
 
-export function crearEvento(
-  datos: DatosCrearEvento,
-): Promise<EventoDetalle> {
+export function crearEvento(datos: DatosCrearEvento): Promise<EventoDetalle> {
   return http('/api/events', eventoDetalleSchema, undefined, {
     method: 'POST',
     body: datos,
   })
 }
 
-export function publicarEvento(
-  eventCode: string,
-): Promise<EventoDetalle> {
+export function publicarEvento(eventCode: string): Promise<EventoDetalle> {
   return http(
     `/api/events/${encodeURIComponent(eventCode)}/publish`,
     eventoDetalleSchema,

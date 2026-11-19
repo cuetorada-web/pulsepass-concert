@@ -1,3 +1,4 @@
+import { recordarEvento } from './recientes'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { queryClient } from '../../lib/queryClient'
 import {
@@ -34,6 +35,7 @@ export function useCrearEvento() {
   return useMutation({
     mutationFn: crearEvento,
     onSuccess: (eventoCreado) => {
+      recordarEvento(eventoCreado)
       queryClient.setQueryData(
         ['eventos', 'detalle', eventoCreado.eventCode],
         eventoCreado,
@@ -49,6 +51,7 @@ export function usePublicarEvento() {
   return useMutation({
     mutationFn: publicarEvento,
     onSuccess: (eventoActualizado) => {
+      void queryClient.invalidateQueries({ queryKey: ['eventos', 'por-artista'] })
       queryClient.setQueryData(
         ['eventos', 'detalle', eventoActualizado.eventCode],
         eventoActualizado,
@@ -62,14 +65,10 @@ export function usePublicarEvento() {
 
 export function useAsociarArtistaEvento() {
   return useMutation({
-    mutationFn: ({
-      eventCode,
-      artistId,
-    }: {
-      eventCode: string
-      artistId: number
-    }) => asociarArtistaEvento(eventCode, artistId),
+    mutationFn: ({ eventCode, artistId }: { eventCode: string; artistId: number }) =>
+      asociarArtistaEvento(eventCode, artistId),
     onSuccess: (eventoActualizado) => {
+      void queryClient.invalidateQueries({ queryKey: ['eventos', 'por-artista'] })
       queryClient.setQueryData(
         ['eventos', 'detalle', eventoActualizado.eventCode],
         eventoActualizado,

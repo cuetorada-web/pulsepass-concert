@@ -4,6 +4,9 @@ import { useRegistro } from '../features/auth/hooks'
 import { registroSchema } from '../features/auth/tipos'
 import type { DatosRegistro } from '../features/auth/tipos'
 import { ApiError } from '../lib/http'
+import { Navigate } from 'react-router'
+import { RUTAS } from '../lib/rutas'
+import { useAuth } from '../features/auth/AuthContext'
 
 const campos = [
   {
@@ -65,6 +68,7 @@ const campos = [
 ] as const
 
 export default function Registro() {
+  const auth = useAuth()
   const registro = useRegistro()
 
   const {
@@ -105,28 +109,10 @@ export default function Registro() {
     }
   }
 
+  if (auth.estado === 'autenticada') return <Navigate to={RUTAS.inicio} replace />
+
   if (registro.isSuccess) {
-    return (
-      <section
-        aria-labelledby="titulo-registro-exitoso"
-        className="mx-auto max-w-xl rounded-2xl border border-emerald-200 bg-emerald-50 p-8"
-      >
-        <h1
-          id="titulo-registro-exitoso"
-          className="text-2xl font-bold text-emerald-900"
-        >
-          ¡Tu cuenta fue creada!
-        </h1>
-
-        <p className="mt-4 text-emerald-900">
-          Ya puedes usar tu usuario o correo para iniciar sesión.
-        </p>
-
-        <p className="mt-3 text-sm text-emerald-800">
-          En el siguiente paso agregaremos la pantalla de inicio de sesión.
-        </p>
-      </section>
-    )
+    return <Navigate to={RUTAS.login} replace state={{ registroExitoso: true }} />
   }
 
   return (
@@ -142,15 +128,8 @@ export default function Registro() {
         Regístrate para gestionar tus entradas en PulsePass.
       </p>
 
-      <form
-        noValidate
-        onSubmit={handleSubmit(enviar)}
-        className="mt-8"
-      >
-        <fieldset
-          disabled={registro.isPending}
-          className="grid gap-5 sm:grid-cols-2"
-        >
+      <form noValidate onSubmit={handleSubmit(enviar)} className="mt-8">
+        <fieldset disabled={registro.isPending} className="grid gap-5 sm:grid-cols-2">
           <legend className="sr-only">Datos de registro</legend>
 
           {campos.map((campo) => {
@@ -158,10 +137,7 @@ export default function Registro() {
 
             return (
               <div key={campo.nombre}>
-                <label
-                  htmlFor={campo.nombre}
-                  className="block text-sm font-semibold"
-                >
+                <label htmlFor={campo.nombre} className="block text-sm font-semibold">
                   {campo.etiqueta}
                 </label>
 
@@ -171,9 +147,7 @@ export default function Registro() {
                   autoComplete={campo.autocompletar}
                   required={campo.obligatorio}
                   aria-invalid={Boolean(error)}
-                  aria-describedby={
-                    error ? `${campo.nombre}-error` : undefined
-                  }
+                  aria-describedby={error ? `${campo.nombre}-error` : undefined}
                   {...register(campo.nombre)}
                   className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2 disabled:bg-slate-100"
                 />
@@ -197,10 +171,7 @@ export default function Registro() {
         </p>
 
         {registro.isError && (
-          <p
-            role="alert"
-            className="mt-5 rounded-lg bg-red-50 p-4 text-red-800"
-          >
+          <p role="alert" className="mt-5 rounded-lg bg-red-50 p-4 text-red-800">
             {registro.error instanceof ApiError
               ? registro.error.status === 409
                 ? 'No pudimos crear la cuenta. Prueba con otro usuario o correo electrónico.'

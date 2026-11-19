@@ -11,8 +11,7 @@ const sesionSchema = z.object({
 type Sesion = z.infer<typeof sesionSchema>
 
 type EstadoSesion =
-  | { estado: 'anonima'; expirada: boolean }
-  | { estado: 'conToken'; sesion: Sesion }
+  { estado: 'anonima'; expirada: boolean } | { estado: 'conToken'; sesion: Sesion }
 
 function restaurar(): EstadoSesion {
   try {
@@ -30,6 +29,7 @@ function restaurar(): EstadoSesion {
     }
 
     sessionStorage.removeItem(CLAVE)
+    sessionStorage.removeItem('pulsepass.eventos-creados')
     return { estado: 'anonima', expirada: true }
   } catch {
     return { estado: 'anonima', expirada: false }
@@ -63,6 +63,7 @@ export function cerrarSesion(expirada = false) {
 
   try {
     sessionStorage.removeItem(CLAVE)
+    sessionStorage.removeItem('pulsepass.eventos-creados')
   } catch {
     // La sesión en memoria se cierra aunque el almacenamiento no esté disponible.
   }
@@ -77,10 +78,7 @@ function programarExpiracion() {
   if (actual.estado === 'conToken') {
     const tiempoRestante = actual.sesion.expiraEn - Date.now()
 
-    temporizador = setTimeout(
-      () => cerrarSesion(true),
-      Math.max(0, tiempoRestante),
-    )
+    temporizador = setTimeout(() => cerrarSesion(true), Math.max(0, tiempoRestante))
   }
 }
 

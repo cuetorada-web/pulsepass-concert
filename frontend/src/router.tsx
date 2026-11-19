@@ -3,11 +3,13 @@ import RutaProtegida from './components/RutaProtegida'
 import Layout from './layouts/Layout'
 import { RUTAS } from './lib/rutas'
 import Inicio from './pages/Inicio'
+import ErrorPagina from './pages/ErrorPagina'
 
 export const router = createBrowserRouter([
   {
     path: RUTAS.inicio,
     Component: Layout,
+    ErrorBoundary: ErrorPagina,
     children: [
       {
         index: true,
@@ -110,7 +112,8 @@ export const router = createBrowserRouter([
       {
         path: RUTAS.adminDetalleEvento,
         lazy: async () => {
-          const { default: AdminDetalleEvento } = await import('./pages/AdminDetalleEvento')
+          const { default: AdminDetalleEvento } =
+            await import('./pages/AdminDetalleEvento')
           return {
             Component: () => (
               <RutaProtegida rolesPermitidos={['ADMIN']}>
@@ -131,6 +134,78 @@ export const router = createBrowserRouter([
         path: RUTAS.login,
         lazy: async () => {
           const { default: Component } = await import('./pages/Login')
+          return { Component }
+        },
+      },
+      {
+        path: RUTAS.cuenta,
+        lazy: async () => {
+          const { default: Pagina } = await import('./pages/Cuenta')
+          return {
+            Component: () => (
+              <RutaProtegida>
+                <Pagina />
+              </RutaProtegida>
+            ),
+          }
+        },
+      },
+      {
+        path: RUTAS.confirmacionCompra,
+        lazy: async () => {
+          const { default: Pagina } = await import('./pages/ConfirmacionCompra')
+          return {
+            Component: () => (
+              <RutaProtegida>
+                <Pagina />
+              </RutaProtegida>
+            ),
+          }
+        },
+      },
+      {
+        path: RUTAS.validacionIngreso,
+        lazy: async () => {
+          const { default: Pagina } = await import('./pages/ValidacionIngreso')
+          return {
+            Component: () => (
+              <RutaProtegida rolesPermitidos={['STAFF', 'ADMIN']}>
+                <Pagina />
+              </RutaProtegida>
+            ),
+          }
+        },
+      },
+      {
+        path: RUTAS.buscarTicketsPagados,
+        lazy: async () => {
+          const { default: Pagina } = await import('./pages/TicketsPagadosEvento')
+          return {
+            Component: () => (
+              <RutaProtegida rolesPermitidos={['STAFF', 'ADMIN']}>
+                <Pagina />
+              </RutaProtegida>
+            ),
+          }
+        },
+      },
+      {
+        path: RUTAS.ticketsPagados,
+        lazy: async () => {
+          const { default: Pagina } = await import('./pages/TicketsPagadosEvento')
+          return {
+            Component: () => (
+              <RutaProtegida rolesPermitidos={['STAFF', 'ADMIN']}>
+                <Pagina />
+              </RutaProtegida>
+            ),
+          }
+        },
+      },
+      {
+        path: RUTAS.sinPermisos,
+        lazy: async () => {
+          const { default: Component } = await import('./pages/SinPermisos')
           return { Component }
         },
       },

@@ -1,270 +1,186 @@
-import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useCrearEvento } from '../features/eventos/hooks'
-import {
-  categoriaEventoSchema,
-  categorias,
-  crearEventoSchema,
-  type CategoriaEvento,
-} from '../features/eventos/tipos'
+import { categorias, crearEventoSchema } from '../features/eventos/tipos'
+import type { DatosCrearEvento } from '../features/eventos/tipos'
 import { useSedesActivas } from '../features/sedes/hooks'
 import { RUTAS } from '../lib/rutas'
-
+import { ApiError } from '../lib/http'
+import ErrorConsulta from '../components/ErrorConsulta'
+const campos = [
+  { nombre: 'eventCode', etiqueta: 'Código del evento', tipo: 'text' },
+  { nombre: 'name', etiqueta: 'Nombre', tipo: 'text' },
+  { nombre: 'eventDate', etiqueta: 'Fecha y hora', tipo: 'datetime-local' },
+  {
+    nombre: 'minimumAge',
+    etiqueta: 'Edad mínima (0 = todas las edades)',
+    tipo: 'number',
+  },
+] as const
+const camposServidor = crearEventoSchema.keyof()
 export default function AdminNuevoEvento() {
-  const navigate = useNavigate()
-  const sedesConsulta = useSedesActivas()
+  const navegar = useNavigate()
+  const sedes = useSedesActivas()
   const creacion = useCrearEvento()
-
-  const [eventCode, setEventCode] = useState('')
-  const [name, setName] = useState('')
-  const [description, setDescription] = useState('')
-  const [category, setCategory] = useState<CategoriaEvento>('MUSIC')
-  const [eventDate, setEventDate] = useState('')
-  const [minimumAge, setMinimumAge] = useState('0')
-  const [venueCode, setVenueCode] = useState('')
-  const [errorFormulario, setErrorFormulario] = useState<string | null>(null)
-
-  function manejarEnvio(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    setErrorFormulario(null)
-
-    const fechaNormalizada =
-      eventDate.length === 16 ? `${eventDate}:00` : eventDate
-
-    const validacion = crearEventoSchema.safeParse({
-      eventCode,
-      name,
-      description,
-      category,
-      eventDate: fechaNormalizada,
-      minimumAge: Number(minimumAge),
-      venueCode,
-    })
-
-    if (!validacion.success) {
-      setErrorFormulario(
-        validacion.error.issues[0]?.message ??
-          'Revisa los datos ingresados.',
-      )
-      return
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors },
+  } = useForm<DatosCrearEvento>({
+    resolver: zodResolver(crearEventoSchema),
+    defaultValues: {
+      eventCode: '',
+      name: '',
+      description: '',
+      category: 'MUSIC',
+      eventDate: '',
+      minimumAge: 0,
+      venueCode: '',
+    },
+  })
+  async function enviar(datos: DatosCrearEvento) {
+    try {
+      const creado = await creacion.mutateAsync({
+        ...datos,
+        eventDate:
+          datos.eventDate.length === 16 ? `${datos.eventDate}:00` : datos.eventDate,
+      })
+      await navegar(RUTAS.adminEvento(creado.eventCode))
+    } catch (error: unknown) {
+      if (error instanceof ApiError && error.status === 400)
+        for (const [clave, mensaje] of Object.entries(error.details)) {
+          const campo = camposServidor.safeParse(clave)
+          if (campo.success && typeof mensaje === 'string')
+            setError(campo.data, { message: mensaje })
+        }
     }
-
-    creacion.mutate(validacion.data, {
-      onSuccess: (eventoCreado) => {
-        void navigate(RUTAS.adminEvento(eventoCreado.eventCode))
-      },
-      onError: (error) => {
-        setErrorFormulario(
-          error instanceof Error
-            ? error.message
-            : 'No pudimos crear el evento.',
-        )
-      },
-    })
   }
-
   return (
-    <section aria-labelledby="titulo-nuevo-evento" className="max-w-2xl">
-      <Link
-        to={RUTAS.adminEventos}
-        className="text-sm font-semibold text-primary-700 underline"
-      >
-        Volver a administrar eventos
+    <section className="mx-auto max-w-2xl">
+      <Link className="text-sm text-primary-700 underline" to={RUTAS.adminEventos}>
+        Volver a eventos
       </Link>
-
-      <h1
-        id="titulo-nuevo-evento"
-        className="mt-4 text-3xl font-bold tracking-tight"
-      >
-        Crear nuevo evento
-      </h1>
-      <p className="mt-2 text-slate-600">
-        El evento se creará en estado <strong>Borrador</strong> para que puedas asociar artistas antes de publicarlo.
-      </p>
-
-      <form
-        onSubmit={manejarEnvio}
-        className="mt-8 space-y-5 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8"
-      >
-        <div className="grid gap-5 sm:grid-cols-2">
+      <h1 className="mt-5 text-3xl font-bold">Nuevo evento</h1>
+      <form noValidate onSubmit={handleSubmit(enviar)} className="surface mt-6">
+        <fieldset disabled={creacion.isPending} className="space-y-5">
+          <legend className="sr-only">Información del evento</legend>
+          {campos.map((campo) => (
+            <div key={campo.nombre}>
+              <label htmlFor={campo.nombre} className="block text-sm font-semibold">
+                {campo.etiqueta}
+              </label>
+              <input
+                id={campo.nombre}
+                type={campo.tipo}
+                {...register(
+                  campo.nombre,
+                  campo.nombre === 'minimumAge' ? { valueAsNumber: true } : {},
+                )}
+                aria-invalid={Boolean(errors[campo.nombre])}
+                aria-describedby={
+                  errors[campo.nombre] ? `${campo.nombre}-error` : undefined
+                }
+                className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2"
+              />
+              {errors[campo.nombre] && (
+                <p
+                  id={`${campo.nombre}-error`}
+                  role="alert"
+                  className="mt-1 text-sm text-red-700"
+                >
+                  {errors[campo.nombre]?.message}
+                </p>
+              )}
+            </div>
+          ))}
           <div>
-            <label
-              htmlFor="eventCode"
-              className="block text-sm font-semibold text-slate-700"
-            >
-              Código del evento
+            <label htmlFor="description" className="text-sm font-semibold">
+              Descripción
             </label>
-            <input
-              id="eventCode"
-              type="text"
-              required
-              placeholder="Ej. EVT-ROCK-2026"
-              value={eventCode}
-              onChange={(e) => setEventCode(e.target.value)}
-              disabled={creacion.isPending}
-              className="mt-1.5 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-primary-600 focus:outline-none"
+            <textarea
+              id="description"
+              rows={4}
+              {...register('description')}
+              className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2"
             />
+            {errors.description && (
+              <p role="alert" className="text-sm text-red-700">
+                {errors.description.message}
+              </p>
+            )}
           </div>
-
           <div>
-            <label
-              htmlFor="category"
-              className="block text-sm font-semibold text-slate-700"
-            >
+            <label htmlFor="category" className="text-sm font-semibold">
               Categoría
             </label>
             <select
               id="category"
-              value={category}
-              onChange={(e) =>
-                setCategory(e.target.value as CategoriaEvento)
-              }
-              disabled={creacion.isPending}
-              className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-primary-600 focus:outline-none"
+              {...register('category')}
+              className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2"
             >
-              {categoriaEventoSchema.options.map((cat) => (
-                <option key={cat} value={cat}>
-                  {categorias[cat]}
+              {Object.entries(categorias).map(([valor, etiqueta]) => (
+                <option key={valor} value={valor}>
+                  {etiqueta}
                 </option>
               ))}
             </select>
+            {errors.category && <p role="alert">{errors.category.message}</p>}
           </div>
-        </div>
-
-        <div>
-          <label
-            htmlFor="name"
-            className="block text-sm font-semibold text-slate-700"
-          >
-            Nombre del evento
-          </label>
-          <input
-            id="name"
-            type="text"
-            required
-            placeholder="Ej. Festival Caribe Sonoro 2026"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            disabled={creacion.isPending}
-            className="mt-1.5 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-primary-600 focus:outline-none"
-          />
-        </div>
-
-        <div>
-          <label
-            htmlFor="description"
-            className="block text-sm font-semibold text-slate-700"
-          >
-            Descripción
-          </label>
-          <textarea
-            id="description"
-            rows={3}
-            placeholder="Detalles del espectáculo, apertura de puertas, recomendaciones…"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            disabled={creacion.isPending}
-            className="mt-1.5 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-primary-600 focus:outline-none"
-          />
-        </div>
-
-        <div className="grid gap-5 sm:grid-cols-2">
           <div>
-            <label
-              htmlFor="eventDate"
-              className="block text-sm font-semibold text-slate-700"
-            >
-              Fecha y hora
+            <label htmlFor="venueCode" className="text-sm font-semibold">
+              Sede
             </label>
-            <input
-              id="eventDate"
-              type="datetime-local"
-              required
-              value={eventDate}
-              onChange={(e) => setEventDate(e.target.value)}
-              disabled={creacion.isPending}
-              className="mt-1.5 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-primary-600 focus:outline-none"
-            />
+            {sedes.isPending ? (
+              <p role="status">Cargando sedes…</p>
+            ) : sedes.isError ? (
+              <ErrorConsulta
+                titulo="No pudimos cargar sedes"
+                error={sedes.error}
+                reintentando={sedes.isFetching}
+                onReintentar={() => void sedes.refetch()}
+              />
+            ) : (
+              <>
+                <select
+                  id="venueCode"
+                  {...register('venueCode')}
+                  className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2"
+                >
+                  <option value="">Selecciona una sede</option>
+                  {sedes.data.map((sede) => (
+                    <option key={sede.id} value={sede.code}>
+                      {sede.name} · {sede.city}
+                    </option>
+                  ))}
+                </select>
+                {sedes.data.length === 0 && (
+                  <p className="mt-2 text-sm text-slate-600">
+                    No hay sedes activas disponibles.
+                  </p>
+                )}
+              </>
+            )}
+            {errors.venueCode && (
+              <p role="alert" className="text-sm text-red-700">
+                {errors.venueCode.message}
+              </p>
+            )}
           </div>
-
-          <div>
-            <label
-              htmlFor="minimumAge"
-              className="block text-sm font-semibold text-slate-700"
-            >
-              Edad mínima (0 = todas las edades)
-            </label>
-            <input
-              id="minimumAge"
-              type="number"
-              min={0}
-              required
-              value={minimumAge}
-              onChange={(e) => setMinimumAge(e.target.value)}
-              disabled={creacion.isPending}
-              className="mt-1.5 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-primary-600 focus:outline-none"
-            />
-          </div>
-        </div>
-
-        <div>
-          <label
-            htmlFor="venueCode"
-            className="block text-sm font-semibold text-slate-700"
-          >
-            Sede
-          </label>
-          {sedesConsulta.isPending ? (
-            <p role="status" className="mt-1.5 text-sm text-slate-500">
-              Cargando sedes activas…
-            </p>
-          ) : sedesConsulta.isError ? (
-            <p role="alert" className="mt-1.5 text-sm text-red-600">
-              No pudimos cargar las sedes activas.
-            </p>
-          ) : (
-            <select
-              id="venueCode"
-              required
-              value={venueCode}
-              onChange={(e) => setVenueCode(e.target.value)}
-              disabled={creacion.isPending}
-              className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-primary-600 focus:outline-none"
-            >
-              <option value="">Selecciona una sede…</option>
-              {sedesConsulta.data.map((sede) => (
-                <option key={sede.id} value={sede.code}>
-                  {sede.name} ({sede.city}) — Cap. {sede.capacity}
-                </option>
-              ))}
-            </select>
-          )}
-        </div>
-
-        {errorFormulario && (
-          <p
-            role="alert"
-            className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700"
-          >
-            {errorFormulario}
+        </fieldset>
+        {creacion.isError && (
+          <p role="alert" className="notice-error mt-5">
+            {creacion.error.message}
           </p>
         )}
-
-        <div className="flex flex-wrap gap-3 pt-2">
-          <button
-            type="submit"
-            disabled={creacion.isPending}
-            className="rounded-lg bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary-700 disabled:opacity-60"
-          >
-            {creacion.isPending ? 'Guardando evento…' : 'Crear borrador de evento'}
-          </button>
-
-          <Link
-            to={RUTAS.adminEventos}
-            className="rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
-          >
+        <div className="mt-6 flex justify-end gap-3">
+          <Link className="btn-secondary" to={RUTAS.adminEventos}>
             Cancelar
           </Link>
+          <button type="submit" className="btn-primary" disabled={creacion.isPending}>
+            {creacion.isPending ? 'Creando…' : 'Crear evento'}
+          </button>
         </div>
       </form>
     </section>

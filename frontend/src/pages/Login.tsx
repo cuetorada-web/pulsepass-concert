@@ -9,6 +9,7 @@ import type { DatosLogin } from '../features/auth/tipos'
 import { cerrarSesion } from '../features/auth/sesion'
 import { ApiError } from '../lib/http'
 import { RUTAS } from '../lib/rutas'
+import { destinoSeguro } from '../lib/validacion'
 
 const estadoNavegacionSchema = z.object({
   registroExitoso: z.boolean().optional(),
@@ -19,10 +20,9 @@ export default function Login() {
   const login = useLogin()
   const navegar = useNavigate()
   const ubicacion = useLocation()
+  const destino = destinoSeguro(ubicacion.state as unknown)
 
-  const aviso = estadoNavegacionSchema.safeParse(
-    ubicacion.state as unknown,
-  )
+  const aviso = estadoNavegacionSchema.safeParse(ubicacion.state as unknown)
 
   const {
     register,
@@ -39,14 +39,14 @@ export default function Login() {
   async function enviar(datos: DatosLogin) {
     try {
       await login.mutateAsync(datos)
-      await navegar(RUTAS.inicio, { replace: true })
+      await navegar(destino, { replace: true })
     } catch {
       // La mutación conserva el error para mostrarlo en el formulario.
     }
   }
 
   if (auth.estado === 'autenticada') {
-    return <Navigate to={RUTAS.inicio} replace />
+    return <Navigate to={destino} replace />
   }
 
   if (auth.estado === 'cargando') {
@@ -62,9 +62,7 @@ export default function Login() {
         Inicia sesión
       </h1>
 
-      <p className="mt-3 text-slate-600">
-        Accede a tu cuenta de PulsePass.
-      </p>
+      <p className="mt-3 text-slate-600">Accede a tu cuenta de PulsePass.</p>
 
       {aviso.success && aviso.data.registroExitoso && (
         <p role="status" className="mt-5 rounded-lg bg-emerald-50 p-4 text-emerald-900">
@@ -81,11 +79,7 @@ export default function Login() {
       {auth.estado === 'error' && (
         <div role="alert" className="mt-5 rounded-lg bg-amber-50 p-4">
           <p>{auth.mensaje}</p>
-          <button
-            type="button"
-            onClick={() => cerrarSesion()}
-            className="mt-3 underline"
-          >
+          <button type="button" onClick={() => cerrarSesion()} className="mt-3 underline">
             Volver a iniciar sesión
           </button>
         </div>

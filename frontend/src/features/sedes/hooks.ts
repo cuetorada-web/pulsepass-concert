@@ -3,6 +3,7 @@ import { obtenerSede, obtenerSedesActivas } from './api'
 
 export function useSedesActivas() {
   return useQuery({
+    staleTime: 300_000,
     queryKey: ['sedes', 'activas'],
     queryFn: ({ signal }) => obtenerSedesActivas(signal),
   })
@@ -10,6 +11,7 @@ export function useSedesActivas() {
 
 export function useSede(code: string) {
   return useQuery({
+    staleTime: 300_000,
     queryKey: ['sedes', 'detalle', code],
     queryFn: ({ signal }) => obtenerSede(code, signal),
   })

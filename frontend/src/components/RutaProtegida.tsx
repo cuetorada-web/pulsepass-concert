@@ -47,7 +47,7 @@ export default function RutaProtegida({
     rolesPermitidos &&
     !rolesPermitidos.some((rol) => auth.usuario.roles.includes(rol))
   ) {
-    return <Navigate to={RUTAS.inicio} replace />
+    return <Navigate to={RUTAS.sinPermisos} replace />
   }
 
   return <>{children}</>

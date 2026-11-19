@@ -31,7 +31,11 @@ function EventosArtista({ stageName }: EventosArtistaProps) {
   const consulta = useEventosPorArtista(stageName)
 
   if (consulta.isPending) {
-    return <p role="status" className="mt-4">Cargando eventos…</p>
+    return (
+      <p role="status" className="mt-4">
+        Cargando eventos…
+      </p>
+    )
   }
 
   if (consulta.isError) {
@@ -58,15 +62,12 @@ function EventosArtista({ stageName }: EventosArtistaProps) {
   return (
     <ul className="mt-5 grid gap-4 md:grid-cols-2">
       {consulta.data.map((evento) => (
-        <li
-          key={evento.id}
-          className="rounded-xl border border-slate-200 bg-white p-5"
-        >
+        <li key={evento.id} className="rounded-xl border border-slate-200 bg-white p-5">
           <p className="text-sm font-semibold text-primary-700">
             {categorias[evento.category]}
           </p>
 
-        <h3 className="mt-2 text-lg font-bold">
+          <h3 className="mt-2 text-lg font-bold">
             <Link
               to={RUTAS.evento(evento.eventCode)}
               className="text-primary-700 underline"
@@ -81,9 +82,7 @@ function EventosArtista({ stageName }: EventosArtistaProps) {
             </time>
           </p>
 
-          <p className="mt-2 text-sm text-slate-600">
-            {evento.venueName}
-          </p>
+          <p className="mt-2 text-sm text-slate-600">{evento.venueName}</p>
         </li>
       ))}
     </ul>
@@ -98,10 +97,7 @@ function PerfilArtista({ id }: PerfilArtistaProps) {
   }
 
   if (consulta.isError) {
-    if (
-      consulta.error instanceof ApiError &&
-      consulta.error.status === 404
-    ) {
+    if (consulta.error instanceof ApiError && consulta.error.status === 404) {
       return <NoEncontrada />
     }
 
@@ -129,9 +125,7 @@ function PerfilArtista({ id }: PerfilArtistaProps) {
       </Link>
 
       <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-6 sm:p-10">
-        <p className="text-sm font-semibold text-primary-700">
-          Perfil de artista
-        </p>
+        <p className="text-sm font-semibold text-primary-700">Perfil de artista</p>
 
         <h1 id="titulo-artista" className="mt-3 text-3xl font-bold">
           {artista.stageName}

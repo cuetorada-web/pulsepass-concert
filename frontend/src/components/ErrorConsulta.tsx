@@ -1,4 +1,6 @@
 import { ApiError } from '../lib/http'
+import { Navigate } from 'react-router'
+import { RUTAS } from '../lib/rutas'
 
 interface ErrorConsultaProps {
   titulo: string
@@ -13,14 +15,11 @@ export default function ErrorConsulta({
   reintentando,
   onReintentar,
 }: ErrorConsultaProps) {
+  if (error instanceof ApiError && error.status === 403)
+    return <Navigate to={RUTAS.sinPermisos} replace />
   return (
-    <div
-      role="alert"
-      className="mt-8 rounded-2xl border border-red-200 bg-red-50 p-6"
-    >
-      <h2 className="font-semibold text-red-900">
-        {titulo}
-      </h2>
+    <div role="alert" className="mt-8 rounded-2xl border border-red-200 bg-red-50 p-6">
+      <h2 className="font-semibold text-red-900">{titulo}</h2>
 
       <p className="mt-2 text-red-800">
         {error instanceof ApiError
