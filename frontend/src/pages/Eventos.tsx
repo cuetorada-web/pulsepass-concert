@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router'
 import { useQuery } from '@tanstack/react-query'
 import { http } from '../lib/http'
 import { artistaSchema } from '../features/artistas/tipos'
+import Cargando from '../components/Cargando'
 import {
   obtenerEventosPorArtista,
   obtenerEventosPublicados,
@@ -112,7 +113,7 @@ export default function Eventos() {
         <button
           type="button"
           onClick={() => setParametros({})}
-          className="text-left text-sm font-semibold text-primary-700"
+          className="text-left text-sm font-semibold text-marca-700"
         >
           Limpiar filtros
         </button>
@@ -120,16 +121,13 @@ export default function Eventos() {
       {artista.data && (
         <p className="mb-5 text-sm">
           Eventos de{' '}
-          <Link
-            className="text-primary-700 underline"
-            to={RUTAS.artista(artista.data.id)}
-          >
+          <Link className="text-marca-700 underline" to={RUTAS.artista(artista.data.id)}>
             {artista.data.stageName}
           </Link>
         </p>
       )}
       {consulta.isPending ? (
-        <p role="status">Cargando eventos…</p>
+        <Cargando texto="Cargando eventos…" />
       ) : consulta.isError ? (
         <ErrorConsulta
           titulo="No pudimos cargar los eventos"

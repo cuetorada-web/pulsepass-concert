@@ -7,6 +7,7 @@ import { categorias } from '../features/eventos/tipos'
 import { ApiError } from '../lib/http'
 import { RUTAS } from '../lib/rutas'
 import NoEncontrada from './NoEncontrada'
+import Cargando from '../components/Cargando'
 
 const idSchema = z
   .string()
@@ -31,11 +32,7 @@ function EventosArtista({ stageName }: EventosArtistaProps) {
   const consulta = useEventosPorArtista(stageName)
 
   if (consulta.isPending) {
-    return (
-      <p role="status" className="mt-4">
-        Cargando eventos…
-      </p>
-    )
+    return <Cargando texto="Cargando eventos…" />
   }
 
   if (consulta.isError) {
@@ -63,14 +60,14 @@ function EventosArtista({ stageName }: EventosArtistaProps) {
     <ul className="mt-5 grid gap-4 md:grid-cols-2">
       {consulta.data.map((evento) => (
         <li key={evento.id} className="rounded-xl border border-slate-200 bg-white p-5">
-          <p className="text-sm font-semibold text-primary-700">
+          <p className="text-sm font-semibold text-marca-700">
             {categorias[evento.category]}
           </p>
 
           <h3 className="mt-2 text-lg font-bold">
             <Link
               to={RUTAS.evento(evento.eventCode)}
-              className="text-primary-700 underline"
+              className="text-marca-700 underline"
             >
               {evento.name}
             </Link>
@@ -93,7 +90,7 @@ function PerfilArtista({ id }: PerfilArtistaProps) {
   const consulta = useArtista(id)
 
   if (consulta.isPending) {
-    return <p role="status">Cargando artista…</p>
+    return <Cargando texto="Cargando artista…" />
   }
 
   if (consulta.isError) {
@@ -119,13 +116,13 @@ function PerfilArtista({ id }: PerfilArtistaProps) {
     <section aria-labelledby="titulo-artista">
       <Link
         to={RUTAS.artistas}
-        className="text-sm font-semibold text-primary-700 underline"
+        className="text-sm font-semibold text-marca-700 underline"
       >
         Volver a artistas
       </Link>
 
       <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-6 sm:p-10">
-        <p className="text-sm font-semibold text-primary-700">Perfil de artista</p>
+        <p className="text-sm font-semibold text-marca-700">Perfil de artista</p>
 
         <h1 id="titulo-artista" className="mt-3 text-3xl font-bold">
           {artista.stageName}

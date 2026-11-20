@@ -1,6 +1,7 @@
 import { clsx } from 'clsx'
-import { useId } from 'react'
+import { useId, useState } from 'react'
 import type { ComponentProps, ReactNode } from 'react'
+import { IconoOjo, IconoOjoOculto } from './Iconos'
 
 interface BotonProps extends ComponentProps<'button'> {
   variante?: 'primario' | 'secundario' | 'peligro'
@@ -52,6 +53,56 @@ export function Campo({ etiqueta, error, id: idProp, className, ...props }: Camp
           className,
         )}
       />
+      {error && (
+        <p id={`${id}-error`} role="alert" className="mt-2 text-sm text-red-700">
+          {error}
+        </p>
+      )}
+    </div>
+  )
+}
+interface CampoContrasenaProps extends Omit<CampoProps, 'type'> {
+  children?: ReactNode
+}
+export function CampoContrasena({
+  etiqueta,
+  error,
+  id: idProp,
+  className,
+  children,
+  ...props
+}: CampoContrasenaProps) {
+  const generado = useId()
+  const id = idProp ?? generado
+  const [visible, setVisible] = useState(false)
+  return (
+    <div>
+      <label htmlFor={id} className="block text-sm font-semibold">
+        {etiqueta}
+      </label>
+      <div className="relative mt-2">
+        <input
+          {...props}
+          id={id}
+          type={visible ? 'text' : 'password'}
+          aria-invalid={Boolean(error)}
+          aria-describedby={error ? `${id}-error` : undefined}
+          className={clsx(
+            'w-full rounded-lg border border-slate-300 py-2 pr-12 pl-3',
+            className,
+          )}
+        />
+        <button
+          type="button"
+          aria-label={visible ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+          aria-pressed={visible}
+          onClick={() => setVisible((v) => !v)}
+          className="absolute inset-y-0 right-0 flex w-11 items-center justify-center rounded-lg text-xl text-slate-600"
+        >
+          {visible ? <IconoOjoOculto /> : <IconoOjo />}
+        </button>
+      </div>
+      {children}
       {error && (
         <p id={`${id}-error`} role="alert" className="mt-2 text-sm text-red-700">
           {error}

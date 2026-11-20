@@ -4,6 +4,7 @@ import { Link, useParams } from 'react-router'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useArtistasActivos } from '../features/artistas/hooks'
+import Cargando from '../components/Cargando'
 import {
   useEvento,
   usePublicarEvento,
@@ -38,7 +39,7 @@ function Gestion({ codigo }: Props) {
     resolver: zodResolver(schema),
     defaultValues: { artistId: '' },
   })
-  if (evento.isPending) return <p role="status">Cargando evento…</p>
+  if (evento.isPending) return <Cargando texto="Cargando evento…" />
   if (evento.isError)
     return (
       <ErrorConsulta
@@ -49,9 +50,11 @@ function Gestion({ codigo }: Props) {
       />
     )
   const e = evento.data
+  const disponibles = <T extends { id: number }>(lista: T[]) =>
+    lista.filter((a) => !e.artists.some((x) => x.id === a.id))
   return (
     <section>
-      <Link to={RUTAS.adminEventos} className="text-sm text-primary-700 underline">
+      <Link to={RUTAS.adminEventos} className="text-sm text-marca-700 underline">
         Volver a eventos
       </Link>
       <div className="surface mt-6">
@@ -99,7 +102,7 @@ function Gestion({ codigo }: Props) {
           <ul className="mt-4 space-y-3">
             {e.artists.map((a) => (
               <li key={a.id}>
-                <Link to={RUTAS.artista(a.id)} className="text-primary-700 underline">
+                <Link to={RUTAS.artista(a.id)} className="text-marca-700 underline">
                   {a.stageName}
                 </Link>
               </li>
@@ -107,9 +110,7 @@ function Gestion({ codigo }: Props) {
           </ul>
         )}
         {artistas.isPending ? (
-          <p role="status" className="mt-5">
-            Cargando artistas…
-          </p>
+          <Cargando texto="Cargando artistas…" />
         ) : artistas.isError ? (
           <ErrorConsulta
             titulo="No pudimos cargar artistas"
@@ -138,7 +139,7 @@ function Gestion({ codigo }: Props) {
                 className="min-w-0 flex-1 rounded-lg border border-slate-300 px-3 py-2"
               >
                 <option value="">Selecciona un artista</option>
-                {artistas.data.map((a) => (
+                {disponibles(artistas.data).map((a) => (
                   <option key={a.id} value={a.id}>
                     {a.stageName}
                   </option>
@@ -146,7 +147,7 @@ function Gestion({ codigo }: Props) {
               </select>
               <button
                 className="btn-primary"
-                disabled={asociar.isPending || artistas.data.length === 0}
+                disabled={asociar.isPending || disponibles(artistas.data).length === 0}
                 type="submit"
               >
                 {asociar.isPending ? 'Asociando…' : 'Asociar'}

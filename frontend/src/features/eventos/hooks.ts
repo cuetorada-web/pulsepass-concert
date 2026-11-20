@@ -28,6 +28,7 @@ export function useEvento(eventCode: string) {
   return useQuery({
     queryKey: ['eventos', 'detalle', eventCode],
     queryFn: ({ signal }) => obtenerEvento(eventCode, signal),
+    staleTime: 30_000,
   })
 }
 

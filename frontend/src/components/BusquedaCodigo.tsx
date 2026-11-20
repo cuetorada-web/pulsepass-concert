@@ -8,8 +8,14 @@ interface Props {
   etiqueta: string
   onBuscar: (codigo: string) => void
   inicial?: string
+  enfocar?: boolean
 }
-export default function BusquedaCodigo({ etiqueta, onBuscar, inicial = '' }: Props) {
+export default function BusquedaCodigo({
+  etiqueta,
+  onBuscar,
+  inicial = '',
+  enfocar = false,
+}: Props) {
   const {
     register,
     handleSubmit,
@@ -30,6 +36,7 @@ export default function BusquedaCodigo({ etiqueta, onBuscar, inicial = '' }: Pro
           id="codigo-busqueda"
           {...register('codigo')}
           autoComplete="off"
+          autoFocus={enfocar}
           error={errors.codigo?.message}
         />
         <Boton type="submit">Buscar</Boton>

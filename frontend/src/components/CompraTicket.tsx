@@ -52,6 +52,7 @@ export default function CompraTicket({ evento }: Props) {
         </Link>
       </aside>
     )
+  if (!auth.usuario.roles.includes('USER')) return null
   function comprar() {
     if (!confirmacion || auth.estado !== 'autenticada') return
     compra.mutate(
@@ -67,6 +68,7 @@ export default function CompraTicket({ evento }: Props) {
     <aside className="surface h-fit">
       <h2 className="text-xl font-bold">Entradas</h2>
       <form
+        id="form-compra"
         noValidate
         onSubmit={handleSubmit((datos) => {
           compra.reset()
@@ -74,28 +76,38 @@ export default function CompraTicket({ evento }: Props) {
         })}
         className="mt-5"
       >
-        <label htmlFor="tipo-ticket" className="text-sm font-semibold">
-          Selecciona tu entrada
-        </label>
-        <select
-          id="tipo-ticket"
-          {...register('type')}
-          className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2"
-        >
-          {tipoTicketSchema.options.map((tipo) => (
-            <option key={tipo} value={tipo}>
-              {tiposTicket[tipo]}
-            </option>
-          ))}
-        </select>
+        <fieldset>
+          <legend className="text-sm font-semibold">Tipo de entrada</legend>
+          <div className="mt-3 grid gap-2">
+            {tipoTicketSchema.options.map((tipo) => (
+              <label
+                key={tipo}
+                className="flex cursor-pointer items-center gap-3 rounded-lg border border-slate-300 px-3 py-3 has-checked:border-marca-500 has-checked:bg-marca-50"
+              >
+                <input
+                  type="radio"
+                  value={tipo}
+                  {...register('type')}
+                  className="size-4 accent-marca-600"
+                />
+                <span>{tiposTicket[tipo]}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
         {errors.type && <p role="alert">{errors.type.message}</p>}
-        <button className="btn-primary mt-5 w-full" type="submit">
+        <button className="btn-primary mt-5 hidden w-full md:block" type="submit">
           Comprar entrada
         </button>
         <p className="mt-4 text-sm text-slate-500">
           El precio final se informa al emitir la entrada.
         </p>
       </form>
+      <div className="fixed inset-x-0 bottom-0 z-20 border-t border-slate-200 bg-white p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] md:hidden dark:border-slate-700 dark:bg-slate-900">
+        <button className="btn-primary w-full" type="submit" form="form-compra">
+          Comprar
+        </button>
+      </div>
       {confirmacion && (
         <Modal
           titulo="Confirmar compra"
@@ -104,7 +116,7 @@ export default function CompraTicket({ evento }: Props) {
         >
           <p className="font-semibold">{evento.name}</p>
           <p className="mt-3">Tipo: {tiposTicket[confirmacion.type]}</p>
-          <p className="mt-3 break-all text-sm text-slate-600">
+          <p className="mt-3 text-sm break-all text-slate-600">
             Titular: {auth.usuario.email}
           </p>
           <p className="mt-4 text-sm text-slate-600">

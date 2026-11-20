@@ -43,7 +43,9 @@ export default function Layout() {
     { ruta: RUTAS.eventos, texto: 'Eventos' },
     { ruta: RUTAS.artistas, texto: 'Artistas' },
     { ruta: RUTAS.sedes, texto: 'Sedes' },
-    ...(autenticada ? [{ ruta: RUTAS.misTickets, texto: 'Mis tickets' }] : []),
+    ...(autenticada && auth.usuario.roles.includes('USER')
+      ? [{ ruta: RUTAS.misTickets, texto: 'Mis tickets' }]
+      : []),
     ...(operativo
       ? [
           { ruta: RUTAS.validacionIngreso, texto: 'Validar ingreso' },
@@ -78,7 +80,7 @@ export default function Layout() {
           >
             <span
               aria-hidden="true"
-              className="flex size-8 items-center justify-center rounded-lg bg-primary-600 text-white"
+              className="flex size-8 items-center justify-center rounded-lg bg-marca-600 text-white"
             >
               ♫
             </span>
@@ -115,7 +117,7 @@ export default function Layout() {
                   to={ruta}
                   onClick={() => setMenu(false)}
                   className={({ isActive }) =>
-                    `rounded-lg px-3 py-2 text-sm font-medium ${isActive ? 'bg-primary-50 text-primary-700' : 'text-slate-600 hover:bg-slate-100'}`
+                    `rounded-lg px-3 py-2 text-sm font-medium ${isActive ? 'bg-marca-50 text-marca-700' : 'text-slate-600 hover:bg-slate-100'}`
                   }
                 >
                   {texto}
@@ -128,7 +130,7 @@ export default function Layout() {
                   <Link
                     to={RUTAS.cuenta}
                     onClick={() => setMenu(false)}
-                    className="font-semibold text-primary-700"
+                    className="font-semibold text-marca-700"
                   >
                     {auth.usuario.username}
                   </Link>
@@ -150,7 +152,7 @@ export default function Layout() {
                   <Link
                     to={RUTAS.login}
                     onClick={() => setMenu(false)}
-                    className="text-primary-700"
+                    className="text-marca-700"
                   >
                     Ingresar
                   </Link>

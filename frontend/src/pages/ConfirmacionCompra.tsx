@@ -5,13 +5,14 @@ import { precioCOP } from '../lib/formato'
 import { RUTAS } from '../lib/rutas'
 import ErrorConsulta from '../components/ErrorConsulta'
 import NoEncontrada from './NoEncontrada'
+import Cargando from '../components/Cargando'
 
 interface Props {
   codigo: string
 }
 function Confirmacion({ codigo }: Props) {
   const consulta = useTicket(codigo)
-  if (consulta.isPending) return <p role="status">Cargando confirmación…</p>
+  if (consulta.isPending) return <Cargando texto="Cargando confirmación…" />
   if (consulta.isError)
     return (
       <ErrorConsulta
@@ -32,7 +33,7 @@ function Confirmacion({ codigo }: Props) {
       </div>
       <h1 className="mt-6 text-2xl font-bold">¡Compra realizada con éxito!</h1>
       <p className="mt-4 font-semibold">{ticket.eventName}</p>
-      <p className="mt-2 break-all text-sm text-slate-600">Ticket: {ticket.ticketCode}</p>
+      <p className="mt-2 text-sm break-all text-slate-600">Ticket: {ticket.ticketCode}</p>
       <p className="mt-2 text-slate-600">Total: {precioCOP(ticket.price)}</p>
       <div className="mt-8 flex flex-wrap justify-center gap-3">
         <Link className="btn-primary" to={RUTAS.ticket(ticket.ticketCode)}>

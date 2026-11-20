@@ -151,6 +151,7 @@ it('segundo uso 409 se muestra como rechazo', async () => {
 })
 it('asociación duplicada 409 se conserva como aviso', async () => {
   server.use(
+    http.get('*/api/events/:code', () => HttpResponse.json({ ...evento, artists: [] })),
     http.post('*/api/events/:code/artists/:id', () =>
       HttpResponse.json(errorApi(409, 'Artista ya asociado'), { status: 409 }),
     ),

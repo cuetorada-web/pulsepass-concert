@@ -18,7 +18,7 @@ export default function Badge({ estado, texto }: Props) {
     <span
       className={clsx(
         'inline-flex rounded-full px-3 py-1 text-xs font-semibold',
-        tonos[estado] ?? 'bg-primary-50 text-primary-700',
+        tonos[estado] ?? 'bg-marca-50 text-marca-700',
       )}
     >
       {texto}

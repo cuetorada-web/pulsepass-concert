@@ -6,6 +6,7 @@ import TarjetaEvento from '../components/TarjetaEvento'
 import ErrorConsulta from '../components/ErrorConsulta'
 import Estado from '../components/Estado'
 import { useAuth } from '../features/auth/AuthContext'
+import Cargando from '../components/Cargando'
 export default function Inicio() {
   const auth = useAuth()
   const eventos = useEventosPublicados()
@@ -27,12 +28,14 @@ export default function Inicio() {
             Ver cartelera
           </Link>
           {auth.estado === 'autenticada' ? (
-            <Link
-              to={RUTAS.misTickets}
-              className="rounded-lg border border-white/70 px-6 py-3 text-center text-sm font-semibold"
-            >
-              Ver mis tickets
-            </Link>
+            auth.usuario.roles.includes('USER') && (
+              <Link
+                to={RUTAS.misTickets}
+                className="rounded-lg border border-white/70 px-6 py-3 text-center text-sm font-semibold"
+              >
+                Ver mis tickets
+              </Link>
+            )
           ) : auth.estado === 'anonima' ? (
             <Link
               to={RUTAS.registro}
@@ -48,12 +51,12 @@ export default function Inicio() {
           <h2 id="proximos-eventos" className="text-xl font-bold">
             Próximos eventos
           </h2>
-          <Link className="text-sm font-semibold text-primary-700" to={RUTAS.eventos}>
+          <Link className="text-sm font-semibold text-marca-700" to={RUTAS.eventos}>
             Ver cartelera
           </Link>
         </div>
         {eventos.isPending ? (
-          <p role="status">Cargando eventos…</p>
+          <Cargando texto="Cargando eventos…" />
         ) : eventos.isError ? (
           <ErrorConsulta
             titulo="No pudimos cargar los eventos"
@@ -78,12 +81,12 @@ export default function Inicio() {
           <h2 id="artistas-destacados" className="text-xl font-bold">
             Artistas destacados
           </h2>
-          <Link to={RUTAS.artistas} className="text-sm font-semibold text-primary-700">
+          <Link to={RUTAS.artistas} className="text-sm font-semibold text-marca-700">
             Ver todos
           </Link>
         </div>
         {artistas.isPending ? (
-          <p role="status">Cargando artistas…</p>
+          <Cargando texto="Cargando artistas…" />
         ) : artistas.isError ? (
           <ErrorConsulta
             titulo="No pudimos cargar artistas"

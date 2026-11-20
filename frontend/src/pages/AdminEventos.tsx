@@ -4,6 +4,7 @@ import { eventosRecordados } from '../features/eventos/recientes'
 import { RUTAS } from '../lib/rutas'
 import BusquedaCodigo from '../components/BusquedaCodigo'
 import ErrorConsulta from '../components/ErrorConsulta'
+import Cargando from '../components/Cargando'
 export default function AdminEventos() {
   const navegar = useNavigate()
   const consulta = useEventosPublicados()
@@ -37,7 +38,7 @@ export default function AdminEventos() {
                   {evento.eventCode} · {evento.name}
                 </span>
                 <Link
-                  className="text-primary-700 underline"
+                  className="text-marca-700 underline"
                   to={RUTAS.adminEvento(evento.eventCode)}
                 >
                   Gestionar
@@ -46,7 +47,7 @@ export default function AdminEventos() {
             ))}
           </ul>
         )}
-        <p className="mt-5 rounded-lg bg-primary-50 p-4 text-sm text-primary-700">
+        <p className="mt-5 rounded-lg bg-marca-50 p-4 text-sm text-marca-700">
           Los borradores se consultan por su código. Esta lista recuerda los creados
           durante la sesión actual.
         </p>
@@ -54,9 +55,7 @@ export default function AdminEventos() {
       <section className="mt-8">
         <h2 className="text-xl font-bold">Eventos publicados</h2>
         {consulta.isPending ? (
-          <p role="status" className="mt-4">
-            Cargando eventos…
-          </p>
+          <Cargando texto="Cargando eventos…" />
         ) : consulta.isError ? (
           <ErrorConsulta
             titulo="No pudimos cargar eventos"
@@ -74,7 +73,7 @@ export default function AdminEventos() {
                   {e.eventCode} · {e.name}
                 </span>
                 <Link
-                  className="text-primary-700 underline"
+                  className="text-marca-700 underline"
                   to={RUTAS.adminEvento(e.eventCode)}
                 >
                   Gestionar

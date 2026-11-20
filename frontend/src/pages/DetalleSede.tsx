@@ -5,6 +5,7 @@ import { useSede } from '../features/sedes/hooks'
 import { ApiError } from '../lib/http'
 import { RUTAS } from '../lib/rutas'
 import NoEncontrada from './NoEncontrada'
+import Cargando from '../components/Cargando'
 
 const codigoSchema = z
   .string()
@@ -23,7 +24,7 @@ function InformacionSede({ code }: InformacionSedeProps) {
   const consulta = useSede(code)
 
   if (consulta.isPending) {
-    return <p role="status">Cargando sede…</p>
+    return <Cargando texto="Cargando sede…" />
   }
 
   if (consulta.isError) {
@@ -47,12 +48,12 @@ function InformacionSede({ code }: InformacionSedeProps) {
 
   return (
     <section aria-labelledby="titulo-sede">
-      <Link to={RUTAS.sedes} className="text-sm font-semibold text-primary-700 underline">
+      <Link to={RUTAS.sedes} className="text-sm font-semibold text-marca-700 underline">
         Volver a sedes
       </Link>
 
       <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-6 sm:p-10">
-        <p className="text-sm font-semibold text-primary-700">{sede.city}</p>
+        <p className="text-sm font-semibold text-marca-700">{sede.city}</p>
 
         <h1 id="titulo-sede" className="mt-3 text-3xl font-bold">
           {sede.name}

@@ -9,17 +9,13 @@ import ErrorConsulta from '../components/ErrorConsulta'
 import IngresoTicket from '../components/IngresoTicket'
 import { Tabla } from '../components/ui'
 import NoEncontrada from './NoEncontrada'
+import Cargando from '../components/Cargando'
 interface Props {
   codigo: string
 }
 function Listado({ codigo }: Props) {
   const consulta = useTicketsPagados(codigo)
-  if (consulta.isPending)
-    return (
-      <p role="status" className="mt-6">
-        Cargando tickets pagados…
-      </p>
-    )
+  if (consulta.isPending) return <Cargando texto="Cargando tickets pagados…" />
   if (consulta.isError)
     return (
       <ErrorConsulta
@@ -55,9 +51,9 @@ function Listado({ codigo }: Props) {
           <ul className="grid gap-4 md:hidden">
             {consulta.data.map((ticket) => (
               <li key={ticket.id} className="surface">
-                <h2 className="break-all font-bold">{ticket.ticketCode}</h2>
+                <h2 className="font-bold break-all">{ticket.ticketCode}</h2>
                 <p className="mt-2 text-sm text-slate-600">{ticket.eventName}</p>
-                <p className="my-3 break-all text-sm text-slate-600">
+                <p className="my-3 text-sm break-all text-slate-600">
                   {tiposTicket[ticket.type]} · {ticket.userEmail} ·{' '}
                   {precioCOP(ticket.price)}
                 </p>

@@ -8,6 +8,7 @@ import { ApiError } from '../lib/http'
 import CompraTicket from '../components/CompraTicket'
 import Badge from '../components/Badge'
 import ErrorConsulta from '../components/ErrorConsulta'
+import Cargando from '../components/Cargando'
 
 function NoDisponible() {
   return (
@@ -27,7 +28,7 @@ interface Props {
 }
 function Contenido({ codigo }: Props) {
   const consulta = useEvento(codigo)
-  if (consulta.isPending) return <p role="status">Cargando evento…</p>
+  if (consulta.isPending) return <Cargando texto="Cargando evento…" />
   if (consulta.isError) {
     if (consulta.error instanceof ApiError && [403, 404].includes(consulta.error.status))
       return <NoDisponible />
@@ -42,15 +43,15 @@ function Contenido({ codigo }: Props) {
   }
   const evento = consulta.data
   return (
-    <section>
-      <Link to={RUTAS.eventos} className="text-sm text-primary-700 underline">
+    <section className="pb-24 md:pb-0">
+      <Link to={RUTAS.eventos} className="text-sm text-marca-700 underline">
         Volver a eventos
       </Link>
       <div className="mt-6 grid items-start gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(260px,1fr)]">
         <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
           <div
             aria-hidden="true"
-            className="flex h-44 items-center justify-center bg-primary-100 text-7xl text-primary-700"
+            className="flex h-44 items-center justify-center bg-marca-100 text-7xl text-marca-700"
           >
             ♫
           </div>
@@ -78,7 +79,7 @@ function Contenido({ codigo }: Props) {
                 </dd>
               </div>
             </dl>
-            <p className="mt-6 whitespace-pre-line leading-7 text-slate-600">
+            <p className="mt-6 leading-7 whitespace-pre-line text-slate-600">
               {evento.description?.trim() || 'Sin descripción disponible.'}
             </p>
             <section className="mt-8">
@@ -93,7 +94,7 @@ function Contenido({ codigo }: Props) {
                     <li key={a.id}>
                       <Link
                         to={RUTAS.artista(a.id)}
-                        className="inline-flex rounded-full bg-primary-50 px-4 py-2 text-sm font-semibold text-primary-700"
+                        className="inline-flex rounded-full bg-marca-50 px-4 py-2 text-sm font-semibold text-marca-700"
                       >
                         {a.stageName}
                       </Link>
@@ -105,7 +106,7 @@ function Contenido({ codigo }: Props) {
             <section className="mt-8 border-t border-slate-200 pt-6">
               <h2 className="text-lg font-bold">Sede</h2>
               <Link
-                className="mt-3 inline-block text-primary-700 underline"
+                className="mt-3 inline-block text-marca-700 underline"
                 to={RUTAS.sede(evento.venueCode)}
               >
                 {evento.venueName}

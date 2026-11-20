@@ -8,6 +8,7 @@ import { useSedesActivas } from '../features/sedes/hooks'
 import { RUTAS } from '../lib/rutas'
 import { ApiError } from '../lib/http'
 import ErrorConsulta from '../components/ErrorConsulta'
+import Cargando from '../components/Cargando'
 const campos = [
   { nombre: 'eventCode', etiqueta: 'Código del evento', tipo: 'text' },
   { nombre: 'name', etiqueta: 'Nombre', tipo: 'text' },
@@ -59,7 +60,7 @@ export default function AdminNuevoEvento() {
   }
   return (
     <section className="mx-auto max-w-2xl">
-      <Link className="text-sm text-primary-700 underline" to={RUTAS.adminEventos}>
+      <Link className="text-sm text-marca-700 underline" to={RUTAS.adminEventos}>
         Volver a eventos
       </Link>
       <h1 className="mt-5 text-3xl font-bold">Nuevo evento</h1>
@@ -133,7 +134,7 @@ export default function AdminNuevoEvento() {
               Sede
             </label>
             {sedes.isPending ? (
-              <p role="status">Cargando sedes…</p>
+              <Cargando texto="Cargando sedes…" />
             ) : sedes.isError ? (
               <ErrorConsulta
                 titulo="No pudimos cargar sedes"

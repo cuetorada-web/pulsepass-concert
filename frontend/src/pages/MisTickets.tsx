@@ -9,6 +9,7 @@ import Badge from '../components/Badge'
 import CancelarTicket from '../components/CancelarTicket'
 import ErrorConsulta from '../components/ErrorConsulta'
 import Estado from '../components/Estado'
+import Cargando from '../components/Cargando'
 const filtroSchema = estadoTicketSchema.or(z.literal('')).catch('')
 export default function MisTickets() {
   const auth = useAuth()
@@ -40,7 +41,7 @@ export default function MisTickets() {
         ))}
       </div>
       {consulta.isPending ? (
-        <p role="status">Cargando tus tickets…</p>
+        <Cargando texto="Cargando tus tickets…" />
       ) : consulta.isError ? (
         <ErrorConsulta
           titulo="No pudimos cargar tus tickets"
@@ -69,7 +70,7 @@ export default function MisTickets() {
                 {tiposTicket[ticket.type]} · {precioCOP(ticket.price)} ·{' '}
                 {fecha(ticket.purchaseDate)}
               </p>
-              <p className="mt-2 break-all text-sm text-slate-500">{ticket.ticketCode}</p>
+              <p className="mt-2 text-sm break-all text-slate-500">{ticket.ticketCode}</p>
               <div className="mt-5 flex flex-wrap justify-end gap-3">
                 <Link className="btn-secondary" to={RUTAS.ticket(ticket.ticketCode)}>
                   Ver detalle

@@ -305,3 +305,34 @@ it('guarda ADMIN permite entrar', () => {
   )
   expect(screen.getByRole('heading', { name: 'Privado' })).toBeInTheDocument()
 })
+
+for (const rol of ['STAFF', 'ADMIN'] as const) {
+  it(`${rol} no ve el panel de compra`, async () => {
+    mostrar(
+      <DetalleEvento />,
+      '/eventos/CMF-2027',
+      { estado: 'autenticada', usuario: { ...usuario, roles: [rol] } },
+      '/eventos/:eventCode',
+    )
+    expect(await screen.findByRole('heading', { name: evento.name })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Comprar entrada' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Comprar' })).toBeNull()
+  })
+}
+it('USER ve el botón de compra y la barra móvil', async () => {
+  mostrar(<DetalleEvento />, '/eventos/CMF-2027', auth, '/eventos/:eventCode')
+  expect(
+    await screen.findByRole('button', { name: 'Comprar entrada' }),
+  ).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'Comprar' })).toBeInTheDocument()
+})
+it('guarda solo USER rechaza a STAFF en mis tickets', async () => {
+  const router = mostrar(
+    <RutaProtegida rolesPermitidos={['USER']}>
+      <h1>Mis tickets</h1>
+    </RutaProtegida>,
+    '/mis-tickets',
+    { estado: 'autenticada', usuario: { ...usuario, roles: ['STAFF'] } },
+  )
+  await waitFor(() => expect(router.state.location.pathname).toBe('/403'))
+})

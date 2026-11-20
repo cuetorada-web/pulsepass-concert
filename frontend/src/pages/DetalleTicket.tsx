@@ -5,9 +5,12 @@ import { codigoSchema } from '../lib/validacion'
 import { fecha, precioCOP } from '../lib/formato'
 import { RUTAS } from '../lib/rutas'
 import { ApiError } from '../lib/http'
+import BotonCopiar from '../components/BotonCopiar'
+import CodigoTexto from '../components/CodigoTexto'
 import Badge from '../components/Badge'
 import ErrorConsulta from '../components/ErrorConsulta'
 import CancelarTicket from '../components/CancelarTicket'
+import Cargando from '../components/Cargando'
 function NoDisponible() {
   return (
     <section className="surface">
@@ -26,7 +29,7 @@ interface Props {
 }
 function Contenido({ codigo }: Props) {
   const consulta = useTicket(codigo)
-  if (consulta.isPending) return <p role="status">Cargando detalle del ticket…</p>
+  if (consulta.isPending) return <Cargando texto="Cargando detalle del ticket…" />
   if (consulta.isError)
     return consulta.error instanceof ApiError &&
       [403, 404].includes(consulta.error.status) ? (
@@ -42,7 +45,7 @@ function Contenido({ codigo }: Props) {
   const t = consulta.data
   return (
     <section>
-      <Link to={RUTAS.misTickets} className="text-sm text-primary-700 underline">
+      <Link to={RUTAS.misTickets} className="text-sm text-marca-700 underline">
         Volver a mis tickets
       </Link>
       <div className="surface mt-6">
@@ -50,7 +53,17 @@ function Contenido({ codigo }: Props) {
           <h1 className="text-2xl font-bold">{t.eventName}</h1>
           <Badge estado={t.status} texto={estadosTicket[t.status]} />
         </div>
-        <p className="mt-3 break-all text-sm text-slate-500">{t.ticketCode}</p>
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+          <p className="text-sm text-slate-500">
+            Código{' '}
+            <CodigoTexto
+              codigo={t.ticketCode}
+              className="text-base break-all text-slate-900"
+            />
+          </p>
+          <BotonCopiar texto={t.ticketCode} />
+        </div>
+        <p className="mt-3 text-sm text-slate-600">Presenta este código en el ingreso.</p>
         <dl className="mt-8 grid gap-6 sm:grid-cols-2">
           {[
             ['Tipo', tiposTicket[t.type]],
@@ -65,7 +78,7 @@ function Contenido({ codigo }: Props) {
           ))}
         </dl>
         <div className="mt-8 flex flex-wrap justify-between gap-4 border-t border-slate-200 pt-6">
-          <Link className="text-primary-700 underline" to={RUTAS.evento(t.eventCode)}>
+          <Link className="text-marca-700 underline" to={RUTAS.evento(t.eventCode)}>
             Ver evento
           </Link>
           <CancelarTicket ticket={t} />

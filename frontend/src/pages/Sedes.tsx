@@ -2,6 +2,7 @@ import { Link } from 'react-router'
 import { RUTAS } from '../lib/rutas'
 import ErrorConsulta from '../components/ErrorConsulta'
 import { useSedesActivas } from '../features/sedes/hooks'
+import Cargando from '../components/Cargando'
 
 const formatoNumero = new Intl.NumberFormat('es-CO')
 
@@ -19,9 +20,7 @@ export default function Sedes() {
       </p>
 
       {consulta.isPending ? (
-        <p role="status" className="mt-8 text-slate-600">
-          Cargando sedes…
-        </p>
+        <Cargando texto="Cargando sedes…" />
       ) : consulta.isError ? (
         <ErrorConsulta
           titulo="No pudimos cargar las sedes"
@@ -44,7 +43,7 @@ export default function Sedes() {
           {consulta.data.map((sede) => (
             <li key={sede.id}>
               <article className="h-full rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                <span className="inline-block rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-700">
+                <span className="inline-block rounded-full bg-marca-50 px-3 py-1 text-xs font-semibold text-marca-700">
                   {sede.city}
                 </span>
 
@@ -68,7 +67,7 @@ export default function Sedes() {
                 <Link
                   to={RUTAS.sede(sede.code)}
                   aria-label={`Ver detalle de ${sede.name}`}
-                  className="mt-6 inline-flex rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700"
+                  className="mt-6 inline-flex rounded-lg bg-marca-600 px-4 py-2 text-sm font-semibold text-white hover:bg-marca-700"
                 >
                   Ver detalle
                 </Link>

@@ -63,7 +63,7 @@ export const router = createBrowserRouter([
           const { default: MisTickets } = await import('./pages/MisTickets')
           return {
             Component: () => (
-              <RutaProtegida>
+              <RutaProtegida rolesPermitidos={['USER']}>
                 <MisTickets />
               </RutaProtegida>
             ),
@@ -76,7 +76,7 @@ export const router = createBrowserRouter([
           const { default: DetalleTicket } = await import('./pages/DetalleTicket')
           return {
             Component: () => (
-              <RutaProtegida>
+              <RutaProtegida rolesPermitidos={['USER']}>
                 <DetalleTicket />
               </RutaProtegida>
             ),
@@ -156,7 +156,7 @@ export const router = createBrowserRouter([
           const { default: Pagina } = await import('./pages/ConfirmacionCompra')
           return {
             Component: () => (
-              <RutaProtegida>
+              <RutaProtegida rolesPermitidos={['USER']}>
                 <Pagina />
               </RutaProtegida>
             ),

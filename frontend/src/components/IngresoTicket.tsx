@@ -2,8 +2,9 @@ import { useUsarTicket } from '../features/tickets/hooks'
 import type { Ticket } from '../features/tickets/tipos'
 interface Props {
   ticket: Ticket
+  onExito?: () => void
 }
-export default function IngresoTicket({ ticket }: Props) {
+export default function IngresoTicket({ ticket, onExito }: Props) {
   const ingreso = useUsarTicket()
   return (
     <div>
@@ -12,7 +13,9 @@ export default function IngresoTicket({ ticket }: Props) {
           type="button"
           className="btn-primary"
           disabled={ingreso.isPending}
-          onClick={() => ingreso.mutate(ticket.ticketCode)}
+          onClick={() =>
+            ingreso.mutate(ticket.ticketCode, { onSuccess: () => onExito?.() })
+          }
         >
           {ingreso.isPending ? 'Registrando…' : 'Marcar como usado'}
         </button>

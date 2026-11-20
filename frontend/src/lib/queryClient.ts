@@ -6,6 +6,7 @@ export const queryClient = new QueryClient({
     onSuccess: () => avisar('Operación completada correctamente.'),
   }),
   defaultOptions: {
+    mutations: { retry: false },
     queries: {
       staleTime: 60_000,
       retry: (intento, error) =>

@@ -45,7 +45,7 @@ Fecha de revisión: 19 de noviembre de 2026. Referencia: PRD Frontend v1.0 y 30 
 
 ## Pruebas automatizadas
 
-98 pruebas con Vitest + Testing Library + MSW antes de esta documentación. Incluyen:
+120 pruebas con Vitest + Testing Library + MSW. Incluyen:
 
 - Validación del cliente HTTP y respuestas, Bearer solo en encabezados, 400/401/403/404/409/500 y red, cierre ante 401, prevención de redirección externa.
 - Carga, éxito, vacío y error en catálogos; estados de carga y error en detalles y paneles.
@@ -55,6 +55,7 @@ Fecha de revisión: 19 de noviembre de 2026. Referencia: PRD Frontend v1.0 y 30 
 - Ingreso exitoso y conflicto de segundo uso; lista de pagados.
 - Crear evento con errores generales y por campo; publicar con confirmación; asociación duplicada.
 - Guardas anónimas/USER/STAFF/ADMIN, caché y expiración con reloj simulado.
+- Pruebas dedicadas TEST-FE-TKT-009, STF-003, GEN-001 y GEN-002; botones por rol, copiar código, radios de compra, mostrar/ocultar contraseña, medidor de fortaleza, foco y limpieza en validación, y filtrado de artistas ya asociados.
 - Axe en inicio, cartelera, login, registro, tickets y creación de evento: sin infracciones críticas o serias de las reglas estructurales evaluadas.
 
 Las pruebas no usan red real ni cuentas de la base local. El contraste de color se excluye de axe en jsdom porque no dispone de un motor visual. La prueba de fecha y la de expiración fijan su reloj explícitamente.

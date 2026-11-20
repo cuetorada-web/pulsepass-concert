@@ -5,6 +5,7 @@ import { cerrarSesion } from '../features/auth/sesion'
 import { usePerfilUsuario } from '../features/auth/usuarios'
 import ErrorConsulta from '../components/ErrorConsulta'
 import { RUTAS } from '../lib/rutas'
+import Cargando from '../components/Cargando'
 
 export default function Cuenta() {
   const auth = useAuth()
@@ -15,9 +16,7 @@ export default function Cuenta() {
     <section>
       <h1 className="text-3xl font-bold">Mi cuenta</h1>
       {perfil.isPending ? (
-        <p role="status" className="mt-6">
-          Cargando cuenta…
-        </p>
+        <Cargando texto="Cargando cuenta…" />
       ) : perfil.isError ? (
         <ErrorConsulta
           titulo="No pudimos cargar tu cuenta"
@@ -46,9 +45,11 @@ export default function Cuenta() {
         </div>
       )}
       <div className="mt-6 flex flex-wrap gap-3">
-        <Link className="btn-primary" to={RUTAS.misTickets}>
-          Ver mis tickets
-        </Link>
+        {usuario?.roles.includes('USER') && (
+          <Link className="btn-primary" to={RUTAS.misTickets}>
+            Ver mis tickets
+          </Link>
+        )}
         <button
           className="btn-secondary"
           type="button"

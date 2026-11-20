@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router'
 import { useAuth } from '../features/auth/AuthContext'
 import { useLogin } from '../features/auth/hooks'
+import { CampoContrasena } from '../components/ui'
 import { loginSchema } from '../features/auth/tipos'
 import type { DatosLogin } from '../features/auth/tipos'
 import { cerrarSesion } from '../features/auth/sesion'
@@ -108,25 +109,13 @@ export default function Login() {
             )}
           </div>
 
-          <div>
-            <label htmlFor="password" className="block text-sm font-semibold">
-              Contraseña
-            </label>
-            <input
-              id="password"
-              type="password"
-              autoComplete="current-password"
-              aria-invalid={Boolean(errors.password)}
-              aria-describedby={errors.password ? 'password-error' : undefined}
-              {...register('password')}
-              className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2"
-            />
-            {errors.password && (
-              <p id="password-error" role="alert" className="mt-1 text-sm text-red-700">
-                {errors.password.message}
-              </p>
-            )}
-          </div>
+          <CampoContrasena
+            etiqueta="Contraseña"
+            id="password"
+            autoComplete="current-password"
+            error={errors.password?.message}
+            {...register('password')}
+          />
         </fieldset>
 
         {login.isError && (
@@ -142,7 +131,7 @@ export default function Login() {
         <button
           type="submit"
           disabled={login.isPending || auth.estado === 'error'}
-          className="mt-6 w-full rounded-xl bg-primary-600 px-6 py-3 font-semibold text-white hover:bg-primary-700 disabled:opacity-60"
+          className="mt-6 w-full rounded-xl bg-marca-600 px-6 py-3 font-semibold text-white hover:bg-marca-700 disabled:opacity-60"
         >
           {login.isPending ? 'Ingresando…' : 'Iniciar sesión'}
         </button>
@@ -150,7 +139,7 @@ export default function Login() {
 
       <p className="mt-6 text-center text-sm text-slate-600">
         ¿Todavía no tienes cuenta?{' '}
-        <Link to={RUTAS.registro} className="font-semibold text-primary-700 underline">
+        <Link to={RUTAS.registro} className="font-semibold text-marca-700 underline">
           Regístrate
         </Link>
       </p>

@@ -1,3 +1,4 @@
+import { IconoCerrar } from './Iconos'
 import { useEffect, useId, useRef } from 'react'
 import type { ReactNode } from 'react'
 
@@ -41,7 +42,7 @@ export default function Modal({ titulo, children, onCerrar, ocupado = false }: P
           onClick={onCerrar}
           className="rounded-lg px-3 py-2"
         >
-          ✕
+          <IconoCerrar />
         </button>
       </div>
       <div className="mt-5">{children}</div>

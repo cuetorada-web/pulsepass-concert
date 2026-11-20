@@ -1,12 +1,27 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { useRegistro } from '../features/auth/hooks'
 import { registroSchema } from '../features/auth/tipos'
 import type { DatosRegistro } from '../features/auth/tipos'
 import { ApiError } from '../lib/http'
 import { Navigate } from 'react-router'
+import { CampoContrasena } from '../components/ui'
+import { fortalezaContrasena } from '../lib/validacion'
 import { RUTAS } from '../lib/rutas'
 import { useAuth } from '../features/auth/AuthContext'
+
+const barras = {
+  vacia: 'bg-slate-200',
+  debil: 'bg-red-500',
+  media: 'bg-amber-500',
+  fuerte: 'bg-emerald-600',
+}
+const textoFortaleza = {
+  vacia: '',
+  debil: 'Fortaleza: baja',
+  media: 'Fortaleza: media',
+  fuerte: 'Fortaleza: alta',
+}
 
 const campos = [
   {
@@ -75,6 +90,7 @@ export default function Registro() {
     register,
     handleSubmit,
     setError,
+    control,
     formState: { errors },
   } = useForm<DatosRegistro>({
     resolver: zodResolver(registroSchema),
@@ -89,6 +105,8 @@ export default function Registro() {
       password: '',
     },
   })
+
+  const fortaleza = fortalezaContrasena(useWatch({ control, name: 'password' }) ?? '')
 
   async function enviar(datos: DatosRegistro) {
     try {
@@ -134,6 +152,34 @@ export default function Registro() {
 
           {campos.map((campo) => {
             const error = errors[campo.nombre]
+
+            if (campo.nombre === 'password')
+              return (
+                <div key={campo.nombre} className="sm:col-span-2">
+                  <CampoContrasena
+                    etiqueta={campo.etiqueta}
+                    id={campo.nombre}
+                    autoComplete={campo.autocompletar}
+                    required={campo.obligatorio}
+                    error={error?.message}
+                    {...register('password')}
+                  >
+                    <div aria-hidden="true" className="mt-3 flex gap-1">
+                      {[1, 2, 3, 4, 5].map((n) => (
+                        <span
+                          key={n}
+                          className={`h-1.5 flex-1 rounded-full ${
+                            n <= fortaleza.puntos ? barras[fortaleza.nivel] : barras.vacia
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <p className="mt-1 text-sm text-slate-600">
+                      {textoFortaleza[fortaleza.nivel]}
+                    </p>
+                  </CampoContrasena>
+                </div>
+              )
 
             return (
               <div key={campo.nombre}>
@@ -183,7 +229,7 @@ export default function Registro() {
         <button
           type="submit"
           disabled={registro.isPending}
-          className="mt-6 w-full rounded-xl bg-primary-600 px-6 py-3 font-semibold text-white hover:bg-primary-700 disabled:cursor-wait disabled:opacity-60"
+          className="mt-6 w-full rounded-xl bg-marca-600 px-6 py-3 font-semibold text-white hover:bg-marca-700 disabled:cursor-wait disabled:opacity-60"
         >
           {registro.isPending ? 'Creando cuenta…' : 'Crear cuenta'}
         </button>

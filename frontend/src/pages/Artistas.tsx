@@ -3,6 +3,7 @@ import { useArtistasActivos } from '../features/artistas/hooks'
 import ErrorConsulta from '../components/ErrorConsulta'
 import Estado from '../components/Estado'
 import { RUTAS } from '../lib/rutas'
+import Cargando from '../components/Cargando'
 export default function Artistas() {
   const consulta = useArtistasActivos()
   return (
@@ -12,9 +13,7 @@ export default function Artistas() {
         Conoce a quienes hacen posible cada experiencia.
       </p>
       {consulta.isPending ? (
-        <p role="status" className="mt-6">
-          Cargando artistas…
-        </p>
+        <Cargando texto="Cargando artistas…" />
       ) : consulta.isError ? (
         <ErrorConsulta
           titulo="No pudimos cargar los artistas"
@@ -47,7 +46,7 @@ export default function Artistas() {
               <Link
                 to={RUTAS.artista(a.id)}
                 aria-label={`Ver detalle de ${a.stageName}`}
-                className="mt-5 inline-block text-sm font-semibold text-primary-700 underline"
+                className="mt-5 inline-block text-sm font-semibold text-marca-700 underline"
               >
                 Ver detalle
               </Link>
