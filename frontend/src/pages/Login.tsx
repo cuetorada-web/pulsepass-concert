@@ -4,11 +4,13 @@ import { useForm } from 'react-hook-form'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router'
 import { useAuth } from '../features/auth/AuthContext'
 import { useLogin } from '../features/auth/hooks'
+import { CampoContrasena } from '../components/ui'
 import { loginSchema } from '../features/auth/tipos'
 import type { DatosLogin } from '../features/auth/tipos'
 import { cerrarSesion } from '../features/auth/sesion'
 import { ApiError } from '../lib/http'
 import { RUTAS } from '../lib/rutas'
+import { destinoSeguro } from '../lib/validacion'
 
 const estadoNavegacionSchema = z.object({
   registroExitoso: z.boolean().optional(),
@@ -19,10 +21,9 @@ export default function Login() {
   const login = useLogin()
   const navegar = useNavigate()
   const ubicacion = useLocation()
+  const destino = destinoSeguro(ubicacion.state as unknown)
 
-  const aviso = estadoNavegacionSchema.safeParse(
-    ubicacion.state as unknown,
-  )
+  const aviso = estadoNavegacionSchema.safeParse(ubicacion.state as unknown)
 
   const {
     register,
@@ -39,14 +40,14 @@ export default function Login() {
   async function enviar(datos: DatosLogin) {
     try {
       await login.mutateAsync(datos)
-      await navegar(RUTAS.inicio, { replace: true })
+      await navegar(destino, { replace: true })
     } catch {
       // La mutación conserva el error para mostrarlo en el formulario.
     }
   }
 
   if (auth.estado === 'autenticada') {
-    return <Navigate to={RUTAS.inicio} replace />
+    return <Navigate to={destino} replace />
   }
 
   if (auth.estado === 'cargando') {
@@ -62,9 +63,7 @@ export default function Login() {
         Inicia sesión
       </h1>
 
-      <p className="mt-3 text-slate-600">
-        Accede a tu cuenta de PulsePass.
-      </p>
+      <p className="mt-3 text-slate-600">Accede a tu cuenta de PulsePass.</p>
 
       {aviso.success && aviso.data.registroExitoso && (
         <p role="status" className="mt-5 rounded-lg bg-emerald-50 p-4 text-emerald-900">
@@ -81,11 +80,7 @@ export default function Login() {
       {auth.estado === 'error' && (
         <div role="alert" className="mt-5 rounded-lg bg-amber-50 p-4">
           <p>{auth.mensaje}</p>
-          <button
-            type="button"
-            onClick={() => cerrarSesion()}
-            className="mt-3 underline"
-          >
+          <button type="button" onClick={() => cerrarSesion()} className="mt-3 underline">
             Volver a iniciar sesión
           </button>
         </div>
@@ -114,25 +109,13 @@ export default function Login() {
             )}
           </div>
 
-          <div>
-            <label htmlFor="password" className="block text-sm font-semibold">
-              Contraseña
-            </label>
-            <input
-              id="password"
-              type="password"
-              autoComplete="current-password"
-              aria-invalid={Boolean(errors.password)}
-              aria-describedby={errors.password ? 'password-error' : undefined}
-              {...register('password')}
-              className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2"
-            />
-            {errors.password && (
-              <p id="password-error" role="alert" className="mt-1 text-sm text-red-700">
-                {errors.password.message}
-              </p>
-            )}
-          </div>
+          <CampoContrasena
+            etiqueta="Contraseña"
+            id="password"
+            autoComplete="current-password"
+            error={errors.password?.message}
+            {...register('password')}
+          />
         </fieldset>
 
         {login.isError && (
@@ -148,7 +131,7 @@ export default function Login() {
         <button
           type="submit"
           disabled={login.isPending || auth.estado === 'error'}
-          className="mt-6 w-full rounded-xl bg-primary-600 px-6 py-3 font-semibold text-white hover:bg-primary-700 disabled:opacity-60"
+          className="mt-6 w-full rounded-xl bg-marca-600 px-6 py-3 font-semibold text-white hover:bg-marca-700 disabled:opacity-60"
         >
           {login.isPending ? 'Ingresando…' : 'Iniciar sesión'}
         </button>
@@ -156,7 +139,7 @@ export default function Login() {
 
       <p className="mt-6 text-center text-sm text-slate-600">
         ¿Todavía no tienes cuenta?{' '}
-        <Link to={RUTAS.registro} className="font-semibold text-primary-700 underline">
+        <Link to={RUTAS.registro} className="font-semibold text-marca-700 underline">
           Regístrate
         </Link>
       </p>

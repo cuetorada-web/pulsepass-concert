@@ -10,9 +10,7 @@ export type EstadoAuth =
   | { estado: 'error'; mensaje: string }
   | { estado: 'autenticada'; usuario: UsuarioAutenticado }
 
-export const AuthContext = createContext<EstadoAuth | undefined>(
-  undefined,
-)
+export const AuthContext = createContext<EstadoAuth | undefined>(undefined)
 
 export function useAuth() {
   const contexto = useContext(AuthContext)

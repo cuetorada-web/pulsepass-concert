@@ -7,7 +7,11 @@ export const registroSchema = z.object({
   lastName: z.string().trim().min(1, 'Escribe tus apellidos.'),
   phone: z.string(),
   city: z.string(),
-  birthDate: z.iso.date('Selecciona una fecha válida.'),
+  birthDate: z.iso.date('Selecciona una fecha válida.').refine((valor) => {
+    const hoy = new Date(Date.now())
+    const fechaLocal = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}`
+    return valor <= fechaLocal
+  }, 'La fecha de nacimiento no puede ser futura.'),
   password: z
     .string()
     .min(12, 'Usa al menos 12 caracteres.')

@@ -8,10 +8,7 @@ export function obtenerSedesActivas(signal?: AbortSignal) {
 }
 
 export function obtenerSede(code: string, signal?: AbortSignal) {
-  return http(
-    `/api/venues/${encodeURIComponent(code)}`,
-    sedeSchema,
-    signal,
-    { publica: true },
-  )
+  return http(`/api/venues/${encodeURIComponent(code)}`, sedeSchema, signal, {
+    publica: true,
+  })
 }

@@ -1,8 +1,5 @@
 import { z } from 'zod'
-import {
-  cerrarSesion,
-  obtenerSesion,
-} from '../features/auth/sesion'
+import { cerrarSesion, obtenerSesion } from '../features/auth/sesion'
 
 const errorRespuestaSchema = z.object({
   timestamp: z.string(),
@@ -16,11 +13,7 @@ export class ApiError extends Error {
   readonly status: number
   readonly details: Record<string, unknown>
 
-  constructor(
-    message: string,
-    status: number,
-    details: Record<string, unknown> = {},
-  ) {
+  constructor(message: string, status: number, details: Record<string, unknown> = {}) {
     super(message)
     this.name = 'ApiError'
     this.status = status
@@ -60,26 +53,19 @@ export async function http<T>(
   const sesion = obtenerSesion()
 
   const token =
-    !opciones.publica && sesion.estado === 'conToken'
-      ? sesion.sesion.token
-      : undefined
+    !opciones.publica && sesion.estado === 'conToken' ? sesion.sesion.token : undefined
 
   let respuesta: Response
 
   try {
-    respuesta = await fetch(ruta, {
+    respuesta = await fetch(new URL(ruta, window.location.origin), {
       method: opciones.method ?? 'GET',
       headers: {
         Accept: 'application/json',
-        ...(opciones.body !== undefined
-          ? { 'Content-Type': 'application/json' }
-          : {}),
+        ...(opciones.body !== undefined ? { 'Content-Type': 'application/json' } : {}),
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
-      body:
-        opciones.body !== undefined
-          ? JSON.stringify(opciones.body)
-          : undefined,
+      body: opciones.body !== undefined ? JSON.stringify(opciones.body) : undefined,
       signal,
     })
   } catch (error: unknown) {
@@ -101,18 +87,22 @@ export async function http<T>(
     if (respuesta.status === 401 && token) {
       const vigente = obtenerSesion()
 
-      if (
-        vigente.estado === 'conToken' &&
-        vigente.sesion.token === token
-      ) {
+      if (vigente.estado === 'conToken' && vigente.sesion.token === token) {
         cerrarSesion(true)
       }
     }
 
     const mensaje =
-      respuesta.status === 409 && resultado.success
-        ? resultado.data.message
-        : mensajePorEstado(respuesta.status)
+      respuesta.status === 400 && resultado.success && resultado.data.details
+        ? [
+            mensajePorEstado(400),
+            ...Object.values(resultado.data.details).filter(
+              (valor): valor is string => typeof valor === 'string',
+            ),
+          ].join(' ')
+        : respuesta.status === 409 && resultado.success
+          ? resultado.data.message
+          : mensajePorEstado(respuesta.status)
 
     throw new ApiError(
       mensaje,

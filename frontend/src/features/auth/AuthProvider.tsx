@@ -11,10 +11,7 @@ interface AuthProviderProps {
 }
 
 export default function AuthProvider({ children }: AuthProviderProps) {
-  const sesion = useSyncExternalStore(
-    suscribirSesion,
-    obtenerSesion,
-  )
+  const sesion = useSyncExternalStore(suscribirSesion, obtenerSesion)
 
   const consulta = useQuery({
     ...consultaUsuarioActual,
@@ -37,9 +34,5 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     auth = { estado: 'autenticada', usuario: consulta.data }
   }
 
-  return (
-    <AuthContext.Provider value={auth}>
-      {children}
-    </AuthContext.Provider>
-  )
+  return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>
 }
