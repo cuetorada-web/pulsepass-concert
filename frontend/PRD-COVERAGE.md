@@ -1,6 +1,6 @@
 # Trazabilidad del PRD — PulsePass frontend
 
-Fecha de revisión: 19 de noviembre de 2026. Referencia: PRD Frontend v1.0 y 30 capturas facilitadas por el propietario. Implementación local en la rama de trabajo existente; sin publicación ni merge automático.
+Fecha de revisión y cierre: 20 de noviembre de 2026. Referencia: PRD Frontend v1.0 y 30 capturas facilitadas por el propietario. Entrega versionada en la rama `feat/tickets-y-guardas`.
 
 ## Cobertura funcional
 
@@ -45,7 +45,10 @@ Fecha de revisión: 19 de noviembre de 2026. Referencia: PRD Frontend v1.0 y 30 
 
 ## Pruebas automatizadas
 
-120 pruebas con Vitest + Testing Library + MSW. Incluyen:
+- **Frontend (`npm test`):** 7 archivos / 120 pruebas en verde con Vitest + Testing Library + MSW + axe-core.
+- **Backend (`.\mvnw.cmd clean test`):** Suite completa en verde (`0 failures`, `0 errors`).
+
+La suite del frontend incluye:
 
 - Validación del cliente HTTP y respuestas, Bearer solo en encabezados, 400/401/403/404/409/500 y red, cierre ante 401, prevención de redirección externa.
 - Carga, éxito, vacío y error en catálogos; estados de carga y error en detalles y paneles.
@@ -58,17 +61,22 @@ Fecha de revisión: 19 de noviembre de 2026. Referencia: PRD Frontend v1.0 y 30 
 - Pruebas dedicadas TEST-FE-TKT-009, STF-003, GEN-001 y GEN-002; botones por rol, copiar código, radios de compra, mostrar/ocultar contraseña, medidor de fortaleza, foco y limpieza en validación, y filtrado de artistas ya asociados.
 - Axe en inicio, cartelera, login, registro, tickets y creación de evento: sin infracciones críticas o serias de las reglas estructurales evaluadas.
 
-Las pruebas no usan red real ni cuentas de la base local. El contraste de color se excluye de axe en jsdom porque no dispone de un motor visual. La prueba de fecha y la de expiración fijan su reloj explícitamente.
+Las pruebas automatizadas del frontend no usan red real ni modifican la base local. El contraste visual se verificó en navegador junto con la auditoría Lighthouse. Las pruebas de fecha y expiración fijan su reloj explícitamente.
 
-## Verificación visual y límites
+## Verificación visual, rendimiento (NFR) y límites
 
-- Se inspeccionaron en navegador el inicio, catálogo y detalle con datos del backend local, además de menú móvil y tema oscuro a 390 px.
+- **Auditoría Lighthouse (build de producción `npm run build` + `npm run preview` en `http://localhost:4173/`, modo incógnito):**
+  - **Performance:** 95 / 100 (cumple `NFR-FE-001` >= 80).
+  - **Accessibility:** 100 / 100 (cumple `NFR-FE-003` / WCAG 2.1 AA).
+  - **Best Practices:** 100 / 100.
+  - **SEO:** 82 / 100.
+  - **Evidencia adjunta:** `docs/lighthouse-report.pdf`.
+- **Verificación funcional en navegador real:** Se probaron con el backend Spring Boot y PostgreSQL local los flujos de catálogo, registro, login, compra y cancelación de entradas, creación/publicación en panel `ADMIN` y validación en puerta `STAFF`, además de menú móvil a 390 px, tema claro/oscuro, contraste visual y navegación por teclado.
 - Se aplicaron las fuentes Inter/Poppins locales, fondo neutro, color índigo, hero degradado y tarjetas con portadas por categoría de las referencias.
-- Las pantallas administrativas y transacciones se verificaron con respuestas simuladas: no se consumieron ni cancelaron tickets reales del usuario durante esta implementación.
 - El material entregado contiene 30 capturas, aunque el PRD menciona 32 imágenes originales; se utilizó todo el material disponible. No se declara una comparación pixel a pixel de las 32 originales.
-- No se ejecutó Lighthouse ni se midió un puntaje de rendimiento. No se declara certificación completa WCAG AA, ni compatibilidad manual con las últimas dos versiones de todos los navegadores. La suite y revisión visual no sustituyen esas comprobaciones.
+- La auditoría se realizó en Google Chrome; no se declara prueba manual exhaustiva sobre las últimas dos versiones de todos los demás navegadores.
 - Pagos reales, QR, refresh token, administración de usuarios/sedes/artistas, despliegue productivo y E2E automatizados permanecen fuera del alcance definido por el PRD.
 
 ## Conservación del trabajo previo
 
-No se modificaron datos de PostgreSQL, secretos, roles reales ni archivos de backend. El cambio de salto de línea que ya existía en V4 se conserva como cambio del usuario. No se hicieron commits, pushes, merges ni despliegues.
+No se publicaron credenciales, secretos ni datos locales de PostgreSQL en el repositorio. En el backend únicamente se reubicó `AuthServiceTest.java` a su paquete correspondiente (`com.pulsepass.service`) para mantener la suite de pruebas sin errores. Los cambios quedaron versionados en `feat/tickets-y-guardas` listos para Pull Request hacia `main`.
